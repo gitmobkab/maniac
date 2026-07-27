@@ -1,21 +1,42 @@
 package main
 
-import "core:fmt"
-import "ainsi"
+import "core:time"
 
-ROWS :: 20
-COLUMNS :: 40
-GREEN :: 0
+import "terminal"
+import "game_loop"
+
+DEFAULT_ROWS :: 35
+DEFAUTL_COLUMNS :: 80
+rows: int
+columns: int
 
 main :: proc() {
-    for row in 0..<ROWS {
-        for column in 0..<COLUMNS {
-            red_deg := f64(column) / f64(COLUMNS)
-            blue_deg := f64(row) / f64(ROWS)
-            red := int(red_deg * 255)
-            blue := int(blue_deg * 255)
-            fmt.printf("%s ", ainsi.get_background(red, blue, GREEN))
+    terminal.init_raw_mode()
+    defer terminal.restore_cooked_mode()
+
+    start_time := time.now()
+    w_rows, w_cols, ok := terminal.get_window_size()
+    if ok {
+        rows = w_rows
+        columns = w_cols
+    } else {
+        rows = DEFAULT_ROWS
+        columns = DEFAUTL_COLUMNS
+    }
+    
+    target_fps := 60
+    target_frame_time := time.Duration(f64(time.Second) / f64(target_fps))
+
+    for {
+        frame_start := time.now()
+        elapsed := time.duration_seconds(time.since(start_time))
+
+        game_loop.render_frame(rows, columns, elapsed)
+
+        frame_elapsed := time.since(frame_start)
+        remaining := target_frame_time - frame_elapsed
+        if remaining > 0 {
+            time.accurate_sleep(remaining)
         }
-        fmt.println()
     }
 }
