@@ -1,6 +1,5 @@
 package terminal
 
-import "core:sys/posix"
 import "core:terminal/ansi"
 import "core:strconv"
 import "core:strings"
@@ -10,18 +9,6 @@ CLEAR_SEQ :: ansi.CSI + "2" + ansi.ED
 START_ALT_MODE_SEQ := ansi.CSI + "?1049h"
 STOP_ALT_MODE_SEQ := ansi.CSI + "?1049l"
 
-should_quit: bool = false
-
-
-sigint_handler :: proc "c" (sig: posix.Signal) {
-    should_quit = true
-}
-
-install_sigint_handler :: proc() {
-    action: posix.sigaction_t
-    action.sa_handler = sigint_handler
-    posix.sigaction(.SIGINT, &action, nil)
-}
 
 /*
     tell the terminal to use the alternate screen buffer.
