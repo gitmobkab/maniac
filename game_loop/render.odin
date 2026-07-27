@@ -14,7 +14,6 @@ render_frame :: proc(rows, columns: int, elapsed_time: f64) {
     
     resolution := models.Vec2{f64(columns), f64(rows)}
 
-    terminal.clear_screen(&builder)
 
     for row in 0..<rows {
         for column in 0..<columns {
