@@ -1,12 +1,43 @@
 package terminal
 
+import "core:sys/posix"
 import "core:terminal/ansi"
 import "core:strconv"
 import "core:strings"
+import "core:os"
+
+CLEAR_SEQ :: ansi.CSI + "2" + ansi.ED
+START_ALT_MODE_SEQ := ansi.CSI + "?1049h"
+STOP_ALT_MODE_SEQ := ansi.CSI + "?1049l"
+
+should_quit: bool = false
 
 
-CLEAR_SEQ :: ansi.CSI + "2" + ansi.ED 
+sigint_handler :: proc "c" (sig: posix.Signal) {
+    should_quit = true
+}
 
+install_sigint_handler :: proc() {
+    action: posix.sigaction_t
+    action.sa_handler = sigint_handler
+    posix.sigaction(.SIGINT, &action, nil)
+}
+
+/*
+    tell the terminal to use the alternate screen buffer.
+    should be combined with defer stop_alt_mode()
+*/
+start_alt_mode :: proc() {
+    os.write(os.stdout, transmute([]byte)START_ALT_MODE_SEQ)
+}
+
+/*
+    tell the terminal to stop the alternate screnn buffer.
+    see start_alt_mode()
+*/
+stop_alt_mode ::proc() {
+    os.write(os.stdout, transmute([]byte)STOP_ALT_MODE_SEQ)
+}
 
 /*
     clear the entire screen and move the cursor at (row, col)
