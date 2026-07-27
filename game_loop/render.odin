@@ -23,7 +23,7 @@ render_frame :: proc(rows, columns: int, elapsed_time: f64) {
                 frag_coord = models.Vec2{f64(column), f64(row)},
             }
 
-            cell := shaders.shader_plasma(input)
+            cell := shaders.shader_fire(input)
 
             // Position cursor for this cell (1-indexed, terminals start at 1,1)
             terminal.move_cursor_to(&builder, row + 1, column + 1)
