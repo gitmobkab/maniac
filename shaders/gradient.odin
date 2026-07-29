@@ -13,6 +13,6 @@ shader_gradient :: proc(input: models.Shading_Input) -> models.Cell {
         bg_r = red,
         bg_g = 0,
         bg_b = blue,
-        char = '-',
+        char = ' ',
     }
 }
