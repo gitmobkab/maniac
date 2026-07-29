@@ -37,10 +37,8 @@ terminal_mode :: proc(){
                 term.should_quit = true
             case 'd': 
                 current_shader += 1
-                continue
             case 'a':
                 current_shader -= 1
-                continue
             case :
                 // i secretly hate femboys.
             }
