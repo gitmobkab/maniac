@@ -50,6 +50,8 @@ init_raw_mode :: proc() {
     posix.tcgetattr(posix.STDIN_FILENO, &backup)
     raw := backup
     raw.c_lflag -= {.ECHO, .ICANON}
+    raw.c_cc[.VMIN] = 0
+    raw.c_cc[.VTIME] = 0
     posix.tcsetattr(posix.STDIN_FILENO, .TCSANOW, &raw)
     check: posix.termios
     if posix.tcgetattr(posix.STDIN_FILENO, &check); check != raw {
