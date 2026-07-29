@@ -54,8 +54,12 @@ terminal_mode :: proc(){
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
 
+        render_params := RenderParams{
+            row_end = term.rows + 1,
+            column_end = term.columns + 1,
+        }
         current_shader = wrap_index(current_shader, shaders_num)
-        render_frame(term.rows, term.columns, elapsed, current_shader)
+        render_frame(render_params, elapsed, current_shader)
 
         frame_elapsed := time.since(frame_start)
         remaining := target_frame_time - frame_elapsed
