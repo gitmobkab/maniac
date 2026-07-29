@@ -8,7 +8,33 @@ import "core:os"
 CLEAR_SEQ :: ansi.CSI + "2" + ansi.ED
 START_ALT_MODE_SEQ := ansi.CSI + "?1049h"
 STOP_ALT_MODE_SEQ := ansi.CSI + "?1049l"
+SHOW_CURSOR_SEQ := ansi.CSI + ansi.DECTCEM_SHOW
+HIDE_CURSOR_SEQ := ansi.CSI + ansi.DECTCEM_HIDE
 
+init :: proc() {
+    install_sigint_handler()
+    install_resize_handler()
+
+    init_raw_mode()
+    start_alt_mode()
+    
+    // should fix the issue on windows and other terminals
+    hide_cursor()
+}
+
+cleanup :: proc() {
+    defer restore_cooked_mode()
+    defer stop_alt_mode()
+    defer show_cursor()
+}
+
+hide_cursor :: proc() {
+    os.write(os.stdout, transmute([]byte)HIDE_CURSOR_SEQ)
+}
+
+show_cursor :: proc() {
+    os.write(os.stdout, transmute([]byte)SHOW_CURSOR_SEQ)
+}
 
 /*
     tell the terminal to use the alternate screen buffer.
