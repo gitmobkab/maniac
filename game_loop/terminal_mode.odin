@@ -35,12 +35,19 @@ terminal_mode :: proc(){
             switch key {
             case 'q':
                 term.should_quit = true
-            case 'd': 
-                current_shader += 1
-            case 'a':
-                current_shader -= 1
-            case :
-                // i secretly hate femboys.
+            case 0x1b:
+                seq_buf: [2]u8
+                esc_n, _ := os.read(os.stdin, seq_buf[:])
+                if esc_n == 2 && seq_buf[0] == '[' {
+                    arrow_key := seq_buf[1]
+                    switch arrow_key {
+                    case 'C':
+                        current_shader += 1
+                    case 'D':
+                        current_shader -= 1
+                    }
+                    // need refactoring (obviously)
+                }
             }
             
         }
