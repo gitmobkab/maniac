@@ -43,7 +43,7 @@ terminal_mode :: proc(){
         if n > 0 {
             key := key_buf[0]
             switch key {
-            case 'q':
+            case 'q', 'Q':
                 term.should_quit = true
             case 0x1b:
                 seq_buf: [2]u8
