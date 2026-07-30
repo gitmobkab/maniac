@@ -1,2 +1,8 @@
-# ignore the auto generated binary
+# Put auto generated files here
 maniac
+
+# Put editors settings here
+.vscode
+
+# Put dev related tools config here
+ols.json
