@@ -51,9 +51,9 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
 }
 
 draw_footer :: proc(builder: ^strings.Builder, height: int, elapsed_time: f64) {
-    target_row := height/2 + global_term.rows - 2
-    row_start := global_term.rows - height
-    row_end := global_term.rows + 1
+    row_start := global_term.rows - height + 1
+    row_end := global_term.rows
+    target_row := row_start + height / 2
     width := global_term.columns
     for row in row_start..=row_end {
         move_cursor_to(builder, row)
