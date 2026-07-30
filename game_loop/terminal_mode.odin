@@ -37,7 +37,7 @@ terminal_mode :: proc(){
     }
     for !term.should_quit {
         strings.builder_reset(&global_builder)
-        key_buf: [1]u8
+        key_buf: [1]byte
         n, _ := os.read(os.stdin, key_buf[:])
 
         if n > 0 {
@@ -45,7 +45,7 @@ terminal_mode :: proc(){
             switch key {
             case 'q', 'Q':
                 term.should_quit = true
-            case 0x1b:
+            case '\e':
                 seq_buf: [2]u8
                 esc_n, _ := os.read(os.stdin, seq_buf[:])
                 if esc_n == 2 && seq_buf[0] == '[' {
