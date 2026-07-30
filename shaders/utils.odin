@@ -4,18 +4,23 @@ import "core:math"
 
 import "../models"
 
-shader_proc :: proc(input: models.Shading_Input) -> models.Cell
+shader_proc :: #type proc(input: models.Shading_Input) -> models.Cell
 
-SHADERS := [?]shader_proc{
-    shader_balatro,
-    shader_creation,
-    shader_depth_fog,
-    shader_fire,
-    shader_gradient,
-    shader_matrix,
-    shader_NaN,
-    shader_plasma,
-    shader_ripple,
+Shader :: struct {
+    name: string,
+    s_proc: shader_proc
+}
+
+SHADERS := [?]Shader{
+    {"balatro", shader_balatro},
+    {"creation", shader_creation},
+    {"depth fog", shader_depth_fog},
+    {"fire", shader_fire},
+    {"gradient", shader_gradient},
+    {"matrix", shader_matrix},
+    {"<Missing texture>", shader_NaN},
+    {"plasma", shader_plasma},
+    {"ripple the waves", shader_ripple},
 }
 
 value_noise :: proc(x, y: f64) -> f64 {
