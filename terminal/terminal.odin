@@ -69,8 +69,8 @@ clear_screen :: proc(builder: ^strings.Builder) {
 }
 
 // move the cursor to the specified (row, col) coordinates
-// the values default to (1, 1), which is the upper left corner of the terminal
-move_cursor_to :: proc(builder: ^strings.Builder, row: int = 1, col: int = 1) {
+// the values default to (0, 0), which is the upper left corner of the terminal
+move_cursor_to :: proc(builder: ^strings.Builder, row: int = 0, col: int = 0) {
     buf1, buf2: [8]u8
     row_str := strconv.write_int(buf1[:], i64(row), 10)
     col_str := strconv.write_int(buf2[:], i64(col), 10)
