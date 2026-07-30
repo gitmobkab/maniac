@@ -64,8 +64,8 @@ terminal_mode :: proc(){
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
 
-        render_params.row_end = term.rows - FOOTER_HEIGHT - 1
-        render_params.column_end = term.columns + 1
+        render_params.row_end = term.rows - FOOTER_HEIGHT
+        render_params.column_end = term.columns
 
         current_shader = wrap_index(current_shader, shaders_num)
 
