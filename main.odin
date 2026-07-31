@@ -1,20 +1,28 @@
 package main
 
+import "core:fmt"
 import "core:os"
 import "core:flags"
 
 import "game_loop"
-
-Options :: struct {
-    gpu: bool `usage:"Enable to use GPU based shaders instead."`
-}
+import "models"
 
 main :: proc() {
-    opt: Options
-    flags.parse_or_exit(&opt, os.args, .Unix)
-    if opt.gpu {
-        game_loop.gui()
+    opts := DefaultOptions()
+    flags.parse_or_exit(&opts, os.args, .Unix)
+    if opts.version {
+        fmt.println("maniac", VERSION)
+        os.exit(0)
+    }
+
+    if opts.gpu {
+        game_loop.gui(&opts)
     } else {
-        game_loop.terminal_mode()
+        if ODIN_OS == .Windows {
+            fmt.println("Sorry but the terminal mode isn't supported in windows. use maniac --gpu instead")
+            os.exit(1)
+        } else {
+            game_loop.terminal_mode(&opts)
+        }
     }
 }
