@@ -18,9 +18,6 @@ Winsize :: struct {
     ws_ypixel: u16 // unused
 }
 
-global_term := Terminal {
-    should_quit = false
-}
 
 @(private)
 backup: posix.termios
