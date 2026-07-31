@@ -5,13 +5,21 @@ import "core:strconv"
 import "core:strings"
 import "core:os"
 
+DEFAULT_ROWS :: 35
+DEFAULT_COLUMNS :: 80
 CLEAR_SEQ :: ansi.CSI + "2" + ansi.ED
-START_ALT_MODE_SEQ := ansi.CSI + "?1049h"
-STOP_ALT_MODE_SEQ := ansi.CSI + "?1049l"
-SHOW_CURSOR_SEQ := ansi.CSI + ansi.DECTCEM_SHOW
-HIDE_CURSOR_SEQ := ansi.CSI + ansi.DECTCEM_HIDE
 
-init :: proc() {
+START_ALT_MODE_SEQ :: ansi.CSI + "?1049h"
+STOP_ALT_MODE_SEQ :: ansi.CSI + "?1049l"
+SHOW_CURSOR_SEQ :: ansi.CSI + ansi.DECTCEM_SHOW
+HIDE_CURSOR_SEQ :: ansi.CSI + ansi.DECTCEM_HIDE
+
+global_term := Terminal {
+    should_quit = false
+}
+
+// rows and cols are optionals fallbacks
+init :: proc(rows: int = DEFAULT_ROWS, cols: int = DEFAULT_COLUMNS) {
     install_sigint_handler()
     install_resize_handler()
 
@@ -20,6 +28,10 @@ init :: proc() {
     
     // should fix the issue on windows and other terminals
     hide_cursor()
+
+    global_term.rows = rows
+    global_term.columns = cols
+    update_window_size() // try to update the terminal to it's real size
 }
 
 cleanup :: proc() {
@@ -29,11 +41,11 @@ cleanup :: proc() {
 }
 
 hide_cursor :: proc() {
-    os.write(os.stdout, transmute([]byte)HIDE_CURSOR_SEQ)
+    os.write_string(os.stdout, HIDE_CURSOR_SEQ)
 }
 
 show_cursor :: proc() {
-    os.write(os.stdout, transmute([]byte)SHOW_CURSOR_SEQ)
+    os.write_string(os.stdout, SHOW_CURSOR_SEQ)
 }
 
 /*
@@ -41,7 +53,7 @@ show_cursor :: proc() {
     should be combined with defer stop_alt_mode()
 */
 start_alt_mode :: proc() {
-    os.write(os.stdout, transmute([]byte)START_ALT_MODE_SEQ)
+    os.write_string(os.stdout, START_ALT_MODE_SEQ)
 }
 
 /*
@@ -49,7 +61,7 @@ start_alt_mode :: proc() {
     see start_alt_mode()
 */
 stop_alt_mode ::proc() {
-    os.write(os.stdout, transmute([]byte)STOP_ALT_MODE_SEQ)
+    os.write_string(os.stdout, STOP_ALT_MODE_SEQ)
 }
 
 /*
