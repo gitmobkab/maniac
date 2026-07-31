@@ -5,7 +5,7 @@ import "../models"
 
 
 shader_NaN :: proc(input: models.Shading_Input) -> models.Cell {
-    SQUARE_SIZE :: 2.0 // terminal cells per checker square
+    SQUARE_SIZE :: 8.0 // terminal cells per checker square
 
     // Aspect-correct so squares look square-ish, not stretched
     aspect := input.resolution.y / input.resolution.x * 2.0
