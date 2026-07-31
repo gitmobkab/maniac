@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Odin
+        run: |
+          curl -sL https://github.com/odin-lang/Odin/releases/latest/download/odin-linux-amd64.zip -o odin.zip
+          unzip odin.zip -d /tmp/odin
+          echo "/tmp/odin" >> $GITHUB_PATH
+      - name: Get version
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+      - name: Build
+        run: odin build . -out:maniac-linux -define:VERSION=${{ steps.ver.outputs.version }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maniac-linux
+          path: maniac-linux
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Odin
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/odin-lang/Odin/releases/latest/download/odin-windows-amd64.zip" -OutFile odin.zip
+          Expand-Archive odin.zip -DestinationPath C:\odin
+          echo "C:\odin" | Out-File -FilePath $env:GITHUB_PATH -Append
+      - name: Get version
+        id: ver
+        shell: bash
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+      - name: Build
+        run: odin build . -out:maniac-windows.exe -define:VERSION=${{ steps.ver.outputs.version }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maniac-windows
+          path: maniac-windows.exe
+
+  release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Extract changelog entry
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v ver="$VERSION" '
+            BEGIN{found=0}
+            /^## \[/{ if(found) exit; if($0 ~ "\\[" ver "\\]") found=1; next }
+            found{print}
+          ' CHANGELOG.md > release_notes.md
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          files: |
+            artifacts/maniac-linux/maniac-linux
+            artifacts/maniac-windows/maniac-windows.exe
