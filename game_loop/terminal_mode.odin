@@ -29,9 +29,9 @@ terminal_mode :: proc(opts: ^models.Options) {
     defer strings.builder_destroy(&global_builder)
 
     render_params := RenderParams{
-        row_start = DEFAULT_HEADER_HEIGHT + 1,
         builder = &global_builder,
     }
+    header_height, footer_height : int
     for !term.should_quit {
         strings.builder_reset(&global_builder)
         key_buf: [1]byte
@@ -42,6 +42,8 @@ terminal_mode :: proc(opts: ^models.Options) {
             switch key {
             case 'q', 'Q':
                 term.should_quit = true
+            case 'f', 'F':
+                opts.headless = !opts.headless
             case '\e':
                 seq_buf: [2]u8
                 esc_n, _ := os.read(os.stdin, seq_buf[:])
@@ -61,15 +63,21 @@ terminal_mode :: proc(opts: ^models.Options) {
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
 
-        render_params.row_end = term.rows - DEFAULT_FOOTER_HEIGHT
+        current_shader = wrap_index(current_shader, shaders_num)
+        
+        if opts.headless {
+            header_height = 0
+            footer_height = 0
+        } else {
+            header_height = DEFAULT_HEADER_HEIGHT
+            footer_height = DEFAULT_FOOTER_HEIGHT 
+        }
+        render_params.row_start = header_height + 1
+        render_params.row_end = term.rows - footer_height
         render_params.column_end = term.columns
 
-        current_shader = wrap_index(current_shader, shaders_num)
-
-        if !opts.headless {
-            terminal.draw_header(&global_builder, DEFAULT_HEADER_HEIGHT, current_shader)
-            terminal.draw_footer(&global_builder, DEFAULT_FOOTER_HEIGHT, elapsed)
-        }
+        terminal.draw_header(&global_builder, header_height, current_shader)
+        terminal.draw_footer(&global_builder, footer_height, elapsed)
         render_frame(render_params, elapsed, current_shader)
 
         frame_elapsed := time.since(frame_start)
