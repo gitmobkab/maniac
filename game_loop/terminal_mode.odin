@@ -8,8 +8,6 @@ import "../terminal"
 import "../shaders"
 import "../models"
 
-DEFAULT_ROWS :: 35
-DEFAUTL_COLUMNS :: 80
 DEFAULT_HEADER_HEIGHT :: 3
 DEFAULT_FOOTER_HEIGHT :: 3
 shaders_num := len(shaders.SHADERS)
@@ -20,9 +18,6 @@ terminal_mode :: proc(opts: ^models.Options) {
     defer terminal.cleanup()
     
     term := &terminal.global_term
-    term.rows = DEFAULT_ROWS
-    term.columns = DEFAUTL_COLUMNS
-    terminal.update_window_size()
     start_time := time.now()
     
     target_fps := opts.fps
