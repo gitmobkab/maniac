@@ -16,8 +16,9 @@ shader_ripple :: proc(input: models.Shading_Input) -> models.Cell {
     intensity := u8(clamp(brightness * 255, 0, 255))
 
     return models.Cell{
-        bg_r = 0,
+        bg_r = intensity,
         bg_g = intensity,
-        bg_b = u8(clamp(f64(255 - int(intensity)), 0, 255)),
-        char = ' '}
+        bg_b = intensity,
+        char = ' '
+    }
 }
