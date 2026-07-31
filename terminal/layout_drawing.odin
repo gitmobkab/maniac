@@ -13,7 +13,8 @@ Command :: struct {
 COMMANDS := [?]Command{
     {'q', "quit"},
     {'←', "previous shader"},
-    {'→', "next shader"}
+    {'→', "next shader"},
+    {'f', "Toggle headless mode"}
 }
 ERASE_FULL_LINE :: ansi.CSI + "2" + ansi.EL
 HEADER_BOTTOM_CHAR :: "▁"
