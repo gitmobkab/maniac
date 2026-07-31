@@ -23,19 +23,13 @@ terminal_mode :: proc(opts: ^models.Options) {
     target_fps := opts.fps
     target_frame_time := time.Duration(f64(time.Second) / f64(target_fps))
     
-    header_height := DEFAULT_HEADER_HEIGHT 
-    footer_height := DEFAULT_FOOTER_HEIGHT
-    if opts.headless {
-        header_height = 0
-        footer_height = 0
-    } 
 
     current_shader := 0
     global_builder := strings.builder_make()
     defer strings.builder_destroy(&global_builder)
 
     render_params := RenderParams{
-        row_start = header_height + 1,
+        row_start = DEFAULT_HEADER_HEIGHT + 1,
         builder = &global_builder,
     }
     for !term.should_quit {
@@ -67,14 +61,16 @@ terminal_mode :: proc(opts: ^models.Options) {
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
 
-        render_params.row_end = term.rows - footer_height
+        render_params.row_end = term.rows - DEFAULT_FOOTER_HEIGHT
         render_params.column_end = term.columns
 
         current_shader = wrap_index(current_shader, shaders_num)
 
-        terminal.draw_header(&global_builder, header_height, current_shader)
+        if !opts.headless {
+            terminal.draw_header(&global_builder, DEFAULT_HEADER_HEIGHT, current_shader)
+            terminal.draw_footer(&global_builder, DEFAULT_FOOTER_HEIGHT, elapsed)
+        }
         render_frame(render_params, elapsed, current_shader)
-        terminal.draw_footer(&global_builder, footer_height, elapsed)
 
         frame_elapsed := time.since(frame_start)
         remaining := target_frame_time - frame_elapsed
