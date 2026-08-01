@@ -54,7 +54,7 @@ install_resize_handler :: proc() {
     // windows doesn't actually use a signal to handle window resize
 }
 
-// stub, so compiler doesn't complain, implemented only in terminal_linux
+
 update_window_size :: proc() {
     stdout_h := win.GetStdHandle(win.STD_OUTPUT_HANDLE)
     info: win.CONSOLE_SCREEN_BUFFER_INFO
