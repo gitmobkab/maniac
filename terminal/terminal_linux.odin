@@ -1,5 +1,6 @@
 package terminal
 
+import "core:os"
 import "core:sys/posix"
 import "core:sys/linux"
 
@@ -91,4 +92,38 @@ install_sigint_handler :: proc() {
 
 sigint_handler :: proc "c" (_: posix.Signal) {
     global_term.should_quit = true
+}
+
+/*
+    Handle complex (stupid) parsing logic for terminal keys
+
+    obscure: handle windows resize event
+*/
+poll_key :: proc() -> (Key_Event, bool) {
+    key_buf: [1]byte
+    n, _ := os.read(os.stdin, key_buf[:])
+    if n <= 0 {
+        return Key_Event{}, false
+    }
+
+    key := key_buf[0]
+    if key == '\e' {
+        seq_buf: [2]u8
+        esc_n, _ := os.read(os.stdin, seq_buf[:])
+        if esc_n == 2 && seq_buf[0] == '[' {
+            switch seq_buf[1] {
+            case 'C':
+                return Key_Event{key = .Arrow_Right}, true
+            case 'D':
+                return Key_Event{key = .Arrow_Left}, true
+            case 'A':
+                return Key_Event{key = .Arrow_Up}, true
+            case 'B':
+                return Key_Event{key = .Arrow_Down}, true
+            }
+        }
+        return Key_Event{}, false
+    }
+
+    return Key_Event{key = .Char, char = rune(key)}, true
 }

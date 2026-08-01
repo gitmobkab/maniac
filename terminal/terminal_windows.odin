@@ -32,6 +32,7 @@ init_raw_mode :: proc() {
     for mode in RAW_MODE_DWORDS {
         cooked_mode &~= mode
     }
+    cooked_mode |= win.ENABLE_WINDOW_INPUT
     win.SetConsoleMode(stdin_h, cooked_mode)
 
     stdout_h := get_stdout_handle()
@@ -71,5 +72,55 @@ update_window_size :: proc() {
     if win.GetConsoleScreenBufferInfo(stdout_h, &info) {
         global_term.columns = int(info.srWindow.Right - info.srWindow.Left + 1)
         global_term.rows = int(info.srWindow.Bottom - info.srWindow.Top + 1)
+    }
+}
+
+/*
+    Handle complex (stupid) parsing logic for terminal keys 
+
+    obscure: handle windows resize event
+*/
+poll_key :: proc() -> (Key_Event, bool) {
+    stdin_h := get_stdin_handle()
+
+    for {
+        number_of_events: win.DWORD
+        win.GetNumberOfConsoleInputEvents(stdin_h, &number_of_events)
+        if number_of_events == 0 {
+            return Key_Event{}, false
+        }
+
+        record: win.INPUT_RECORD
+        events_read: win.DWORD
+        win.ReadConsoleInputW(stdin_h, &record, 1, &events_read)
+
+        #partial switch record.EventType {
+        case .WINDOW_BUFFER_SIZE_EVENT:
+            size := record.Event.WindowBufferSizeEvent.dwSize
+            global_term.columns = int(size.X)
+            global_term.rows = int(size.Y)
+            // no key to report yet, loop again for the next queued event
+
+        case .KEY_EVENT:
+            key_event := record.Event.KeyEvent
+            if !bool(key_event.bKeyDown) {
+                continue // ignore key-up, loop again
+            }
+            switch key_event.wVirtualKeyCode {
+            case win.VK_LEFT:
+                return Key_Event{key = .Arrow_Left}, true
+            case win.VK_RIGHT:
+                return Key_Event{key = .Arrow_Right}, true
+            case win.VK_UP:
+                return Key_Event{key = .Arrow_Up}, true
+            case win.VK_DOWN:
+                return Key_Event{key = .Arrow_Down}, true
+            case:
+                return Key_Event{key = .Char, char = rune(key_event.uChar.UnicodeChar)}, true
+            }
+
+        case:
+            // MOUSE_EVENT / MENU_EVENT / FOCUS_EVENT — not interesting, loop again
+        }
     }
 }
