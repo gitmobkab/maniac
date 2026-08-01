@@ -29,7 +29,7 @@ shader_creation :: proc(input: models.Shading_Input) -> models.Cell {
 
         p.x -= 0.5
         p.y -= 0.5
-        p.x *= r.x / r.y
+        p.x *= r.x / (r.y * 2.0) // aspect correction: terminal rows are ~2x taller than columns
 
         z += 0.07
         l = length2(p)

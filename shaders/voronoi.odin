@@ -7,7 +7,7 @@ VORONOI_SCALE :: 0.15
 
 shader_voronoi :: proc(input: models.Shading_Input) -> models.Cell {
     x := input.frag_coord.x * VORONOI_SCALE
-    y := input.frag_coord.y * VORONOI_SCALE + input.time * 0.3
+    y := input.frag_coord.y * 2.0 * VORONOI_SCALE + input.time * 0.3 // aspect correction: rows are ~2x taller than columns
 
     ix, iy := math.floor(x), math.floor(y)
 

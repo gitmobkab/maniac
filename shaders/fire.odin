@@ -1,26 +1,40 @@
 package shaders
 
+import "core:math"
 import "../models"
 
+FIRE_CHARS := [5]rune{' ', '.', ':', '^', '#'}
 
 shader_fire :: proc(input: models.Shading_Input) -> models.Cell {
-    x := input.frag_coord.x * 0.2
-    y := input.frag_coord.y * 0.2 - input.time * 3.0 // scroll upward over time
+    x := input.frag_coord.x * 0.15
+    y := input.frag_coord.y * 0.15 - input.time * 3.5 // scroll upward over time
 
+    // Layered noise (turbulence) for a rougher, more organic flame texture
     n := value_noise(x, y)
-    n += value_noise(x * 2, y * 2) * 0.5
-    n /= 1.5
+    n += value_noise(x * 2.3, y * 2.3) * 0.5
+    n += value_noise(x * 5.1, y * 5.1) * 0.25
+    n /= 1.75
 
-    // Fade brightness toward top of screen (row 0) for a "flame" look
-    fade := 1.0 - (input.frag_coord.y / input.resolution.y)
-    brightness := clamp(n * fade * 1.5, 0, 1)
+    // Per-column wobble so neighboring flames don't breathe in sync
+    flicker := math.sin(input.frag_coord.x * 0.7 + input.time * 6.0) * 0.08
 
-    r := u8(clamp(brightness * 255, 0, 255))
-    g := u8(clamp(brightness * 120, 0, 255))
+    // Fade toward the top of the screen, tapering faster than a linear falloff
+    height_frac := input.frag_coord.y / input.resolution.y
+    fade := clamp(1.0 - height_frac, 0, 1)
+    fade = fade * fade
+
+    intensity := clamp((n + flicker) * fade * 1.6, 0, 1)
+
+    // Color ramp: black -> red -> orange -> yellow -> white as intensity rises
+    r := u8(clamp(intensity * 3.0 * 255, 0, 255))
+    g := u8(clamp((intensity - 0.33) * 3.0 * 255, 0, 255))
+    b := u8(clamp((intensity - 0.75) * 4.0 * 255, 0, 255))
+
+    char_idx := clamp(int(intensity * f64(len(FIRE_CHARS))), 0, len(FIRE_CHARS) - 1)
+
     return models.Cell{
-        bg_r = r,
-        bg_g = g, 
-        bg_b = 0,
-        char = ' '
+        bg_r = r, bg_g = g, bg_b = b,
+        fg_r = 255, fg_g = 255, fg_b = 200,
+        char = FIRE_CHARS[char_idx],
     }
 }

@@ -7,10 +7,10 @@ import "../models"
 shader_NaN :: proc(input: models.Shading_Input) -> models.Cell {
     SQUARE_SIZE :: 8.0 // terminal cells per checker square
 
-    // Aspect-correct so squares look square-ish, not stretched
-    aspect := input.resolution.y / input.resolution.x * 2.0
+    // Aspect-correct so squares look square-ish, not stretched.
+    // This is a fixed font property (rows are ~2x taller than columns), not tied to window size.
     x := input.frag_coord.x
-    y := input.frag_coord.y / aspect
+    y := input.frag_coord.y * 2.0
 
     checker_x := int(math.floor(x / SQUARE_SIZE))
     checker_y := int(math.floor(y / SQUARE_SIZE))

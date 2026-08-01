@@ -16,15 +16,24 @@ shader_plasma :: proc(input: models.Shading_Input) -> models.Cell {
 
     v := (v1 + v2 + v3 + v4) / 4.0 // combine, keep roughly in [-1, 1]
 
-    // Map [-1, 1] to [0, 255] per channel, phase-shifted so colors separate
-    red   := u8(clamp((math.sin(v * math.PI) + 1) * 127.5, 0, 255))
-    green := u8(clamp((math.sin(v * math.PI + 2.0) + 1) * 127.5, 0, 255))
-    blue  := u8(clamp((math.sin(v * math.PI + 4.0) + 1) * 127.5, 0, 255))
+    // Softer amplitude + mid-tone base so channels stay pastel instead of neon-saturated
+    base := 90.0
+    amplitude := 85.0
+    red   := base + amplitude * math.sin(v * math.PI)
+    green := base + amplitude * math.sin(v * math.PI + 2.0)
+    blue  := base + amplitude * math.sin(v * math.PI + 4.0)
+
+    // Pull each channel toward the shared luminance to desaturate further
+    luminance := (red + green + blue) / 3.0
+    desaturation := 0.25
+    red   = mix(red, luminance, desaturation)
+    green = mix(green, luminance, desaturation)
+    blue  = mix(blue, luminance, desaturation)
 
     return models.Cell{
-        bg_r = red,
-        bg_g = green,
-        bg_b = blue,
+        bg_r = u8(clamp(red, 0, 255)),
+        bg_g = u8(clamp(green, 0, 255)),
+        bg_b = u8(clamp(blue, 0, 255)),
         char = ' ',
     }
 }

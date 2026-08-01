@@ -34,7 +34,7 @@ shader_balatro :: proc(input: models.Shading_Input) -> models.Cell {
 
     uv := models.Vec2{
         x = (px - 0.5*input.resolution.x) / screen_len,
-        y = (py - 0.5*input.resolution.y) / screen_len,
+        y = (py - 0.5*input.resolution.y) * 2.0 / screen_len, // aspect correction: terminal rows are ~2x taller than columns
     }
     uv_len := length2(uv)
 
