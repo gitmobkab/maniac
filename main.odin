@@ -18,11 +18,6 @@ main :: proc() {
     if opts.gpu {
         game_loop.gui(&opts)
     } else {
-        if ODIN_OS == .Windows {
-            fmt.println("Sorry but the terminal mode isn't supported in windows. use maniac --gpu instead")
-            os.exit(1)
-        } else {
-            game_loop.terminal_mode(&opts)
-        }
+        game_loop.terminal_mode(&opts)
     }
 }
