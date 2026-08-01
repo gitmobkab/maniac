@@ -21,6 +21,9 @@ SHADERS := [?]Shader{
     {"<Missing texture>", shader_NaN},
     {"plasma", shader_plasma},
     {"ripple the waves", shader_ripple},
+    {"starfield", shader_starfield},
+    {"tunnel", shader_tunnel},
+    {"voronoi", shader_voronoi},
 }
 
 value_noise :: proc(x, y: f64) -> f64 {
