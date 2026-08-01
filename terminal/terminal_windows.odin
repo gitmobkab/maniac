@@ -39,6 +39,9 @@ init_raw_mode :: proc() {
     out_mode: win.DWORD
     win.GetConsoleMode(stdout_h, &out_mode)
     win.SetConsoleMode(stdout_h, out_mode | win.ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+
+    // fix glyph issues in windows terminal
+    win.SetConsoleOutputCP(.UTF8)
 }
 
 
