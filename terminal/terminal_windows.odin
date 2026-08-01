@@ -15,8 +15,18 @@ RAW_MODE_DWORDS :: [2]win.DWORD {
     win.ENABLE_ECHO_INPUT
 }
 
+
+get_stdin_handle :: proc() -> win.HANDLE  {
+    return win.GetStdHandle(win.STD_INPUT_HANDLE)
+}
+
+
+get_stdout_handle :: proc() -> win.HANDLE  {
+    return win.GetStdHandle(win.STD_OUTPUT_HANDLE)
+}
+
 init_raw_mode :: proc() {
-    stdin_h := win.GetStdHandle(win.STD_INPUT_HANDLE)
+    stdin_h := get_stdin_handle()
     cooked_mode: win.DWORD
     win.GetConsoleMode(stdin_h, &cooked_mode)
     for mode in RAW_MODE_DWORDS {
@@ -24,7 +34,7 @@ init_raw_mode :: proc() {
     }
     win.SetConsoleMode(stdin_h, cooked_mode)
 
-    stdout_h := win.GetStdHandle(win.STD_OUTPUT_HANDLE)
+    stdout_h := get_stdout_handle()
     out_mode: win.DWORD
     win.GetConsoleMode(stdout_h, &out_mode)
     win.SetConsoleMode(stdout_h, out_mode | win.ENABLE_VIRTUAL_TERMINAL_PROCESSING)
@@ -32,7 +42,7 @@ init_raw_mode :: proc() {
 
 
 restore_cooked_mode :: proc() {
-    stdin_h := win.GetStdHandle(win.STD_INPUT_HANDLE)
+    stdin_h := get_stdin_handle()
     raw_mode: win.DWORD
     win.GetConsoleMode(stdin_h, &raw_mode)
     for mode in RAW_MODE_DWORDS {
