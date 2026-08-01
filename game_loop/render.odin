@@ -1,4 +1,4 @@
-package gameloop
+package app
 
 import "core:strings"
 

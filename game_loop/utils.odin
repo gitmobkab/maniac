@@ -1,4 +1,4 @@
-package gameloop
+package app
 
 /*
     Wanted to use the x %= limit trick but Odin modulo follows C style

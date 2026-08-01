@@ -1,4 +1,4 @@
-package gameloop
+package app
 
 import "core:strings"
 import "core:os"
@@ -13,7 +13,7 @@ DEFAULT_HEADER_HEIGHT :: 3
 DEFAULT_FOOTER_HEIGHT :: 3
 shaders_num := len(shaders.SHADERS)
 
-terminal_mode :: proc(opts: ^models.Options) {
+run :: proc(opts: ^models.Options) {
     
     terminal.init()
     defer terminal.cleanup()
