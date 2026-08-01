@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:os"
 import "core:flags"
 
-import "game_loop"
+import "app"
 import "models"
 
 main :: proc() {
@@ -15,9 +15,5 @@ main :: proc() {
         os.exit(0)
     }
 
-    if opts.gpu {
-        game_loop.gui(&opts)
-    } else {
-        game_loop.terminal_mode(&opts)
-    }
+    app.run(&opts)
 }
