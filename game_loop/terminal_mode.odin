@@ -3,6 +3,7 @@ package gameloop
 import "core:strings"
 import "core:os"
 import "core:time"
+import "core:unicode"
 
 import "../terminal"
 import "../shaders"
@@ -34,31 +35,24 @@ terminal_mode :: proc(opts: ^models.Options) {
     header_height, footer_height : int
     for !term.should_quit {
         strings.builder_reset(&global_builder)
-        key_buf: [1]byte
-        n, _ := os.read(os.stdin, key_buf[:])
+        event, ok := terminal.poll_key()
 
-        if n > 0 {
-            key := key_buf[0]
-            switch key {
-            case 'q', 'Q':
-                term.should_quit = true
-            case 'f', 'F':
-                opts.headless = !opts.headless
-            case '\e':
-                seq_buf: [2]u8
-                esc_n, _ := os.read(os.stdin, seq_buf[:])
-                if esc_n == 2 && seq_buf[0] == '[' {
-                    arrow_key := seq_buf[1]
-                    switch arrow_key {
-                    case 'C':
-                        current_shader += 1
-                    case 'D':
-                        current_shader -= 1
-                    }
-                    // need refactoring (obviously)
+        if ok {
+            switch event.key {
+            case .Char:
+                switch unicode.to_lower(event.char) {
+                case 'q':
+                    term.should_quit = true
+                case 'f':
+                    opts.headless = !opts.headless
                 }
+            case .Arrow_Right:
+                current_shader += 1
+            case .Arrow_Left:
+                current_shader -= 1
+            case .Arrow_Up, .Arrow_Down, .None:
+                // unused
             }
-            
         }
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
