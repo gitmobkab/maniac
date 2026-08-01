@@ -13,10 +13,3 @@ Key_Event :: struct {
     key:  Key,
     char: rune, 
 }
-
-/*
-    Handle complex (stupid) parsing logic for terminal keys 
-
-    obscure: handle windows resize event
-*/
-poll_key :: proc() -> (Key_Event, bool) // stub, not a type
