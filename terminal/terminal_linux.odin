@@ -3,14 +3,7 @@ package terminal
 import "core:sys/posix"
 import "core:sys/linux"
 
-Terminal :: struct {
-    rows: int,
-    columns: int,
-    should_quit: bool,
-}
-
-
-
+// interface required by linux; does not advice any module to use it
 Winsize :: struct {
     ws_row: u16,
     ws_col: u16,
@@ -19,49 +12,8 @@ Winsize :: struct {
 }
 
 
-@(private)
+@(private="file")
 backup: posix.termios
-
-/*
-    Init the terminal raw mode.
-    It is adviced to immediatly defer the restore_cooked_mode 
-    to prevent corrupting the user terminal on any exit.
-    Calling this function won't make the display use alternative screen.
-
-    See terminal.start_alt_mode() and terminal.stop_alt_mode().
-
-    **Examples**:
-    
-    package "main"
-
-    import "../terminal"
-
-    main :: proc() {
-        init_raw_mode()
-        defer restore_cooked_mode()
-        // your code goes here
-    }
-    
-*/
-init_raw_mode :: proc() {
-    posix.tcgetattr(posix.STDIN_FILENO, &backup)
-    raw := backup
-    raw.c_lflag -= {.ECHO, .ICANON}
-    raw.c_cc[.VMIN] = 0
-    raw.c_cc[.VTIME] = 0
-    posix.tcsetattr(posix.STDIN_FILENO, .TCSANOW, &raw)
-    check: posix.termios
-    if posix.tcgetattr(posix.STDIN_FILENO, &check); check != raw {
-        panic("raw mode did not succeed")
-    }
-}
-
-/*
-    Restore the terminal cooked mode
-*/
-restore_cooked_mode :: proc() {
-    posix.tcsetattr(posix.STDIN_FILENO, .TCSANOW, &backup)
-}
 
 /*
     update the terminal window size.
