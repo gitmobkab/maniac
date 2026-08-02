@@ -31,6 +31,11 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
     target_row := get_target_row(height)
     width := global_term.columns
     target_column := ceil_div(width, 2) - (len(shader.name) / 2) // ignore pls
+    if height == 0 {
+        return
+    }
+    // as couter intuitive as it looks based on the wikipedia article
+    // it really seems that terminals grid start at 0 on x in most kitty and ghostty
     for row in 0..=height {
         move_cursor_to(builder, row)
         strings.write_string(builder, ERASE_FULL_LINE)
