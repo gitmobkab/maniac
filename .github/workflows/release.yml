@@ -12,8 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Odin
         run: |
-          curl -sL https://github.com/odin-lang/Odin/releases/download/dev-2026-07a/odin-linux-amd64-dev-2026-07a.tar.gz -o odin.zip
-          unzip odin.zip -d /tmp/odin
+          curl -sL https://github.com/odin-lang/Odin/releases/download/dev-2026-07a/odin-linux-amd64-dev-2026-07a.tar.gz -o odin.tar.gz
+          mkdir -p /tmp/odin
+          tar -xzf odin.tar.gz -C /tmp/odin --strip-components=1
           echo "/tmp/odin" >> $GITHUB_PATH
       - name: Get version
         id: ver
@@ -32,8 +33,9 @@ jobs:
       - name: Install Odin
         run: |
           Invoke-WebRequest -Uri "https://github.com/odin-lang/Odin/releases/download/dev-2026-07a/odin-windows-amd64-dev-2026-07a.zip" -OutFile odin.zip
-          Expand-Archive odin.zip -DestinationPath C:\odin
-          echo "C:\odin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          Expand-Archive odin.zip -DestinationPath C:\odin_extract
+          $dir = Get-ChildItem -Path C:\odin_extract -Directory | Select-Object -First 1
+          echo "$($dir.FullName)" | Out-File -FilePath $env:GITHUB_PATH -Append
       - name: Get version
         id: ver
         shell: bash
