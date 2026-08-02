@@ -4,6 +4,10 @@ on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. v0.2.0)"
+        required: true
 
 jobs:
   build-linux:
@@ -18,7 +22,10 @@ jobs:
           echo "/tmp/odin" >> $GITHUB_PATH
       - name: Get version
         id: ver
-        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: |
+          RAW="${{ github.event.inputs.version }}"
+          if [ -z "$RAW" ]; then RAW="$GITHUB_REF_NAME"; fi
+          echo "version=${RAW#v}" >> $GITHUB_OUTPUT
       - name: Build
         run: odin build . -out:maniac-linux -define:VERSION=${{ steps.ver.outputs.version }}
       - uses: actions/upload-artifact@v4
@@ -39,7 +46,10 @@ jobs:
       - name: Get version
         id: ver
         shell: bash
-        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: |
+          RAW="${{ github.event.inputs.version }}"
+          if [ -z "$RAW" ]; then RAW="$GITHUB_REF_NAME"; fi
+          echo "version=${RAW#v}" >> $GITHUB_OUTPUT
       - name: Build
         run: odin build . -out:maniac-windows.exe -define:VERSION=${{ steps.ver.outputs.version }}
       - uses: actions/upload-artifact@v4
@@ -50,16 +60,23 @@ jobs:
   release:
     needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+      - name: Get version
+        id: ver
+        run: |
+          RAW="${{ github.event.inputs.version }}"
+          if [ -z "$RAW" ]; then RAW="$GITHUB_REF_NAME"; fi
+          echo "version=${RAW#v}" >> $GITHUB_OUTPUT
       - name: Extract changelog entry
         id: changelog
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          awk -v ver="$VERSION" '
+          awk -v ver="${{ steps.ver.outputs.version }}" '
             BEGIN{found=0}
             /^## \[/{ if(found) exit; if($0 ~ "\\[" ver "\\]") found=1; next }
             found{print}
@@ -67,6 +84,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.ver.outputs.version }}
           body_path: release_notes.md
           files: |
             artifacts/maniac-linux/maniac-linux
