@@ -12,18 +12,24 @@ Shader :: struct {
 }
 
 SHADERS := [?]Shader{
+    {"aurora", shader_aurora},
     {"balatro", shader_balatro},
     {"creation", shader_creation},
     {"depth fog", shader_depth_fog},
+    {"dna helix", shader_dna},
     {"fire", shader_fire},
+    {"glitch", shader_glitch},
     {"gradient", shader_gradient},
     {"kaleidoscope", shader_kaleidoscope},
+    {"mandelbrot", shader_mandelbrot},
     {"matrix", shader_matrix},
     {"metaballs", shader_metaballs},
     {"<Missing texture>", shader_NaN},
     {"plasma", shader_plasma},
+    {"rain", shader_rain},
     {"ripple the waves", shader_ripple},
     {"starfield", shader_starfield},
+    {"synthwave", shader_synthwave},
     {"tunnel", shader_tunnel},
     {"voronoi", shader_voronoi},
 }
