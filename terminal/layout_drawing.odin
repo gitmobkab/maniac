@@ -4,6 +4,7 @@ import "core:terminal/ansi"
 import "core:strings"
 
 import "../shaders"
+import "../models"
 
 Command :: struct {
     key: rune,
@@ -24,6 +25,7 @@ FOOTER_TRUNC_INDICATOR :: "…"
 FOOTER_TAB_WIDTH :: 8 // conservative estimate, tabs don't have a fixed visible width
 ELAPSED_LABEL :: "Elapsed Time: "
 
+
 elapsed_time_buf: [32]byte
 
 draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
@@ -40,7 +42,7 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
         move_cursor_to(builder, row)
         strings.write_string(builder, ERASE_FULL_LINE)
 
-        set_bg_color_to(builder, 41, 41, 41)
+        set_bg_color_to(builder, HEADER_FOOTER_BG)
         
         if row == target_row {
             move_cursor_to(builder, row, target_column)
@@ -51,7 +53,7 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
             strings.write_int(builder, len(shaders.SHADERS))
             strings.write_string(builder, "]")
         } else if row == height{
-            set_fg_color_to(builder, 255, 255, 255)
+            set_fg_color_to(builder, GENERIC_WHITE)
             strings.write_string(builder, strings.repeat(HEADER_BOTTOM_CHAR, width))
         }
     }
@@ -67,8 +69,8 @@ draw_footer :: proc(builder: ^strings.Builder, height: int, elapsed_time: f64) {
         move_cursor_to(builder, row)
         strings.write_string(builder, ERASE_FULL_LINE)
 
-        set_bg_color_to(builder, 41, 42, 45)
-        set_fg_color_to(builder, 255, 255, 255)
+        set_bg_color_to(builder, HEADER_FOOTER_BG)
+        set_fg_color_to(builder, GENERIC_WHITE)
 
         if row == row_start {
             strings.write_string(builder, strings.repeat(FOOTER_TOP_CHAR, width))
@@ -90,14 +92,14 @@ write_commands :: proc(builder: ^strings.Builder, max_width: int) {
         reserve := 0 if is_last else len(FOOTER_TRUNC_INDICATOR)
 
         if used + entry_width + reserve > max_width {
-            set_fg_color_to(builder, 164, 184, 242)
+            set_fg_color_to(builder, BLUEISH)
             strings.write_string(builder, FOOTER_TRUNC_INDICATOR)
             return
         }
 
-        set_fg_color_to(builder, 164, 184 , 242)
+        set_fg_color_to(builder, BLUEISH)
         strings.write_rune(builder, command.key)
-        set_fg_color_to(builder, 255, 255, 255)
+        set_fg_color_to(builder, GENERIC_WHITE)
         strings.write_string(builder, " ")
         strings.write_string(builder, command.help)
         strings.write_string(builder, "\t")

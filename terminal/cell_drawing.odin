@@ -18,8 +18,8 @@ draw_cell :: proc(builder: ^strings.Builder, cell: models.Cell) {
 
 draw_cell_color :: proc(builder: ^strings.Builder, cell: models.Cell, is_background: bool = false) {
     if is_background {
-        set_bg_color_to(builder, cell.bg_r, cell.bg_g, cell.bg_b)
+        set_bg_color_to(builder, cell.bg)
     } else {
-        set_fg_color_to(builder, cell.fg_r, cell.fg_g, cell.fg_b)
+        set_fg_color_to(builder, cell.fg)
     }
 }
