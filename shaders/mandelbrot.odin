@@ -36,9 +36,9 @@ shader_mandelbrot :: proc(input: models.Shading_Input) -> models.Cell {
     }
 
     t := f64(iter) / f64(MANDELBROT_MAX_ITER)
-    red   := u8(clamp((math.sin(t*math.PI*4 + 0) + 1) * 0.5 * 255, 0, 255))
-    green := u8(clamp((math.sin(t*math.PI*4 + 2) + 1) * 0.5 * 255, 0, 255))
-    blue  := u8(clamp((math.sin(t*math.PI*4 + 4) + 1) * 0.5 * 255, 0, 255))
+    red   := clamp_u8((math.sin(t*math.PI*4 + 0) + 1) * 0.5 * 255)
+    green := clamp_u8((math.sin(t*math.PI*4 + 2) + 1) * 0.5 * 255)
+    blue  := clamp_u8((math.sin(t*math.PI*4 + 4) + 1) * 0.5 * 255)
     char_idx := clamp(int(t * f64(len(MANDELBROT_CHARS))), 0, len(MANDELBROT_CHARS)-1)
 
     return models.Cell{

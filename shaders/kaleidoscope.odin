@@ -28,9 +28,9 @@ shader_kaleidoscope :: proc(input: models.Shading_Input) -> models.Cell {
     sample := rotate2(models.Vec2{x = dist, y = 0}, folded + input.time * 0.4)
     v := value_noise(sample.x * 0.08, sample.y * 0.08 + input.time)
 
-    red   := u8(clamp((math.sin(v * math.PI * 2.0) + 1) * 127.5, 0, 255))
-    green := u8(clamp((math.sin(v * math.PI * 2.0 + 2.0) + 1) * 127.5, 0, 255))
-    blue  := u8(clamp((math.sin(v * math.PI * 2.0 + 4.0) + 1) * 127.5, 0, 255))
+    red   := clamp_u8((math.sin(v * math.PI * 2.0) + 1) * 127.5)
+    green := clamp_u8((math.sin(v * math.PI * 2.0 + 2.0) + 1) * 127.5)
+    blue  := clamp_u8((math.sin(v * math.PI * 2.0 + 4.0) + 1) * 127.5)
 
     return models.Cell{
         bg = models.RGB{red, green, blue},

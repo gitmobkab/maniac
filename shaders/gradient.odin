@@ -26,9 +26,9 @@ shader_gradient :: proc(input: models.Shading_Input) -> models.Cell {
     a := GRADIENT_STOPS[i]
     b := GRADIENT_STOPS[j]
 
-    red   := u8(clamp(mix(a[0], b[0], t), 0, 255))
-    green := u8(clamp(mix(a[1], b[1], t), 0, 255))
-    blue  := u8(clamp(mix(a[2], b[2], t), 0, 255))
+    red   := clamp_u8(mix(a[0], b[0], t))
+    green := clamp_u8(mix(a[1], b[1], t))
+    blue  := clamp_u8(mix(a[2], b[2], t))
 
     return models.Cell{
         bg = models.RGB{red, green, blue},

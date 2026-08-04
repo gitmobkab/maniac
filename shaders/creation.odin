@@ -45,9 +45,9 @@ shader_creation :: proc(input: models.Shading_Input) -> models.Cell {
         c[i] = 0.01 / length2(wrapped)
     }
 
-    red   := u8(clamp((c[0] / l) * 255, 0, 255))
-    green := u8(clamp((c[1] / l) * 255, 0, 255))
-    blue  := u8(clamp((c[2] / l) * 255, 0, 255))
+    red   := clamp_u8((c[0] / l) * 255)
+    green := clamp_u8((c[1] / l) * 255)
+    blue  := clamp_u8((c[2] / l) * 255)
 
     return models.Cell{
         bg = models.RGB{

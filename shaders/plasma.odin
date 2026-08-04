@@ -32,9 +32,9 @@ shader_plasma :: proc(input: models.Shading_Input) -> models.Cell {
 
     return models.Cell{
         bg = models.RGB{
-            u8(clamp(red, 0, 255)),
-            u8(clamp(green, 0, 255)),
-            u8(clamp(blue, 0, 255)),
+            clamp_u8(red),
+            clamp_u8(green),
+            clamp_u8(blue),
         },
         char = ' ',
     }

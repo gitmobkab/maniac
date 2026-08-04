@@ -37,12 +37,12 @@ shader_blob :: proc(input: models.Shading_Input) -> models.Cell {
 
     if !hit {
         vign := clamp(1.0 - length2(models.Vec2{x = ux, y = uy}) * 0.35, 0, 1)
-        shade := u8(clamp(vign * 14, 0, 255))
+        shade := clamp_u8(vign * 14)
         return models.Cell{
             bg = models.RGB{
-                u8(clamp(vign * 20, 0, 255)), 
+                clamp_u8(vign * 20), 
                 shade,
-                u8(clamp(vign * 28, 0, 255))
+                clamp_u8(vign * 28)
             },
             char = ' '
         }
@@ -73,9 +73,9 @@ shader_blob :: proc(input: models.Shading_Input) -> models.Cell {
 
     return models.Cell{
         bg = models.RGB{
-            u8(clamp(r * 255, 0, 255)),
-            u8(clamp(g * 255, 0, 255)),
-            u8(clamp(b * 255, 0, 255))
+            clamp_u8(r * 255),
+            clamp_u8(g * 255),
+            clamp_u8(b * 255)
         },
         char = ' ',
     }

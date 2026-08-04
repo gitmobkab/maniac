@@ -23,7 +23,7 @@ shader_starfield :: proc(input: models.Shading_Input) -> models.Cell {
     speed := 1.0 + hash(cell_x, cell_y + 2) * 3.0
     twinkle := (math.sin(input.time * speed + phase) + 1.0) * 0.5
 
-    brightness := u8(clamp(140 + twinkle * 115, 0, 255))
+    brightness := clamp_u8(140 + twinkle * 115)
     chars := [3]rune{'.', '*', '+'}
     char_idx := clamp(int(seed / STAR_DENSITY * 3), 0, 2)
 

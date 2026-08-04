@@ -31,9 +31,9 @@ shader_voronoi :: proc(input: models.Shading_Input) -> models.Cell {
     brightness := clamp(1.0 - min_dist, 0, 1)
     hue := hash(ix, iy) * math.PI * 2
 
-    red   := u8(clamp((math.sin(hue) + 1) * 127 * brightness, 0, 255))
-    green := u8(clamp((math.sin(hue + 2.0) + 1) * 127 * brightness, 0, 255))
-    blue  := u8(clamp((math.sin(hue + 4.0) + 1) * 127 * brightness, 0, 255))
+    red   := clamp_u8((math.sin(hue) + 1) * 127 * brightness)
+    green := clamp_u8((math.sin(hue + 2.0) + 1) * 127 * brightness)
+    blue  := clamp_u8((math.sin(hue + 4.0) + 1) * 127 * brightness)
 
     return models.Cell{
         bg = models.RGB{red, green, blue},

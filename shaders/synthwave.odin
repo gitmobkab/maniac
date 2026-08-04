@@ -33,9 +33,9 @@ shader_synthwave :: proc(input: models.Shading_Input) -> models.Cell {
         if in_sun && (!in_lower_half || !scanline) {
             return models.Cell{
                 bg = models.RGB{
-                    u8(clamp(SYNTHWAVE_SUN_COLOR[0], 0, 255)),
-                    u8(clamp(SYNTHWAVE_SUN_COLOR[1], 0, 255)),
-                    u8(clamp(SYNTHWAVE_SUN_COLOR[2], 0, 255)),
+                    clamp_u8(SYNTHWAVE_SUN_COLOR[0]),
+                    clamp_u8(SYNTHWAVE_SUN_COLOR[1]),
+                    clamp_u8(SYNTHWAVE_SUN_COLOR[2]),
                 },
                 char = ' ',
             }
@@ -43,9 +43,9 @@ shader_synthwave :: proc(input: models.Shading_Input) -> models.Cell {
 
         return models.Cell{
             bg = models.RGB{
-                u8(clamp(r, 0, 255)),
-                u8(clamp(g, 0, 255)),
-                u8(clamp(b, 0, 255)),
+                clamp_u8(r),
+                clamp_u8(g),
+                clamp_u8(b),
             },
             char = ' ',
         }
@@ -72,9 +72,9 @@ shader_synthwave :: proc(input: models.Shading_Input) -> models.Cell {
         return models.Cell{
             bg = models.RGB{10, 5, 20},
             fg = models.RGB{
-                u8(clamp(SYNTHWAVE_GRID_COLOR[0]*fade, 0, 255)),
-                u8(clamp(SYNTHWAVE_GRID_COLOR[1]*fade, 0, 255)),
-                u8(clamp(SYNTHWAVE_GRID_COLOR[2]*fade, 0, 255)),
+                clamp_u8(SYNTHWAVE_GRID_COLOR[0]*fade),
+                clamp_u8(SYNTHWAVE_GRID_COLOR[1]*fade),
+                clamp_u8(SYNTHWAVE_GRID_COLOR[2]*fade),
             },
             char = '-',
         }

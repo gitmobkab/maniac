@@ -35,9 +35,9 @@ shader_glitch :: proc(input: models.Shading_Input) -> models.Cell {
     }
 
     // RGB channel split: sample each channel's "noise" at a slightly different offset
-    red   := u8(clamp(hash(block_x + 1 + burst_seed*3.7, block_y) * 255 * intensity, 0, 255))
-    green := u8(clamp(hash(block_x + burst_seed*3.7, block_y) * 255 * intensity, 0, 255))
-    blue  := u8(clamp(hash(block_x - 1 + burst_seed*3.7, block_y) * 255 * intensity, 0, 255))
+    red   := clamp_u8(hash(block_x + 1 + burst_seed*3.7, block_y) * 255 * intensity)
+    green := clamp_u8(hash(block_x + burst_seed*3.7, block_y) * 255 * intensity)
+    blue  := clamp_u8(hash(block_x - 1 + burst_seed*3.7, block_y) * 255 * intensity)
 
     char_idx := clamp(int(intensity * f64(len(GLITCH_CHARS))), 0, len(GLITCH_CHARS)-1)
 

@@ -17,11 +17,11 @@ shader_tunnel :: proc(input: models.Shading_Input) -> models.Cell {
     stripe := glsl_mod(angle / math.PI * 6.0, 1.0)
 
     brightness := (1.0 - depth) * step(0.5, stripe)
-    intensity := u8(clamp(brightness * 255, 0, 255))
+    intensity := clamp_u8(brightness * 255)
 
     hue_shift := angle + input.time
-    red  := u8(clamp((math.sin(hue_shift) + 1) * f64(intensity) / 2, 0, 255))
-    blue := u8(clamp((math.sin(hue_shift + 2.0) + 1) * f64(intensity) / 2, 0, 255))
+    red  := clamp_u8((math.sin(hue_shift) + 1) * f64(intensity) / 2)
+    blue := clamp_u8((math.sin(hue_shift + 2.0) + 1) * f64(intensity) / 2)
 
     return models.Cell{
         bg = models.RGB{red, intensity, blue},

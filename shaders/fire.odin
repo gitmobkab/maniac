@@ -26,9 +26,9 @@ shader_fire :: proc(input: models.Shading_Input) -> models.Cell {
     intensity := clamp((n + flicker) * fade * 1.6, 0, 1)
 
     // Color ramp: black -> red -> orange -> yellow -> white as intensity rises
-    r := u8(clamp(intensity * 3.0 * 255, 0, 255))
-    g := u8(clamp((intensity - 0.33) * 3.0 * 255, 0, 255))
-    b := u8(clamp((intensity - 0.75) * 4.0 * 255, 0, 255))
+    r := clamp_u8(intensity * 3.0 * 255)
+    g := clamp_u8((intensity - 0.33) * 3.0 * 255)
+    b := clamp_u8((intensity - 0.75) * 4.0 * 255)
 
     char_idx := clamp(int(intensity * f64(len(FIRE_CHARS))), 0, len(FIRE_CHARS) - 1)
 

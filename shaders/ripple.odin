@@ -32,9 +32,9 @@ shader_ripple :: proc(input: models.Shading_Input) -> models.Cell {
 
     // Color drifts slowly through the spectrum so overlapping wavefronts read as color mixing
     hue := input.time*0.3 + brightness*2.0
-    red   := u8(clamp((math.sin(hue) * 0.5 + 0.5) * brightness * 255, 0, 255))
-    green := u8(clamp((math.sin(hue + 2.0) * 0.5 + 0.5) * brightness * 255, 0, 255))
-    blue  := u8(clamp((math.sin(hue + 4.0) * 0.5 + 0.5) * brightness * 255, 0, 255))
+    red   := clamp_u8((math.sin(hue) * 0.5 + 0.5) * brightness * 255)
+    green := clamp_u8((math.sin(hue + 2.0) * 0.5 + 0.5) * brightness * 255)
+    blue  := clamp_u8((math.sin(hue + 4.0) * 0.5 + 0.5) * brightness * 255)
 
     char_idx := clamp(int(brightness * f64(len(RIPPLE_CHARS))), 0, len(RIPPLE_CHARS)-1)
 

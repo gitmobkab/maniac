@@ -42,7 +42,7 @@ shader_matrix :: proc(input: models.Shading_Input) -> models.Cell {
         } // bright white-green head
     }
 
-    green := u8(clamp(trail * 255, 0, 255))
+    green := clamp_u8(trail * 255)
     return models.Cell{
         bg = models.RGB{0, 0, 0},
         fg = models.RGB{0, green, 0},

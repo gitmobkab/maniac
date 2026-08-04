@@ -80,9 +80,9 @@ shader_balatro :: proc(input: models.Shading_Input) -> models.Cell {
 
     return models.Cell{
         bg = models.RGB{
-            u8(clamp(r*255, 0, 255)),
-            u8(clamp(g*255, 0, 255)),
-            u8(clamp(b*255, 0, 255))
+            clamp_u8(r*255),
+            clamp_u8(g*255),
+            clamp_u8(b*255)
         },
         char = ' ',
     }

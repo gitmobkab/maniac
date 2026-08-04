@@ -39,9 +39,9 @@ shader_metaballs :: proc(input: models.Shading_Input) -> models.Cell {
     inside := clamp(-field * falloff, 0, 1)
     glow := clamp(1.0 - math.abs(field) * falloff * 0.75, 0, 1)
 
-    red   := u8(clamp(inside * 255, 0, 255))
-    green := u8(clamp((inside * 0.3 + glow * 0.6) * 255, 0, 255))
-    blue  := u8(clamp((inside * 0.6 + glow * 0.9) * 255, 0, 255))
+    red   := clamp_u8(inside * 255)
+    green := clamp_u8((inside * 0.3 + glow * 0.6) * 255)
+    blue  := clamp_u8((inside * 0.6 + glow * 0.9) * 255)
 
     return models.Cell{
         bg = models.RGB{red, green, blue},

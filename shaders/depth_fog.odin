@@ -24,15 +24,15 @@ shader_depth_fog :: proc(input: models.Shading_Input) -> models.Cell {
     fog_amount := clamp(1.0 - math.exp(-depth * 2.2), 0, 1)
     fog_amount = clamp(fog_amount + mist * 0.25, 0, 1)
 
-    r := u8(clamp(mix(SKY_COLOR[0], FOG_COLOR[0], fog_amount), 0, 255))
-    g := u8(clamp(mix(SKY_COLOR[1], FOG_COLOR[1], fog_amount), 0, 255))
-    b := u8(clamp(mix(SKY_COLOR[2], FOG_COLOR[2], fog_amount), 0, 255))
+    r := clamp_u8(mix(SKY_COLOR[0], FOG_COLOR[0], fog_amount))
+    g := clamp_u8(mix(SKY_COLOR[1], FOG_COLOR[1], fog_amount))
+    b := clamp_u8(mix(SKY_COLOR[2], FOG_COLOR[2], fog_amount))
 
     // Denser mist reads as heavier glyph texture; clear sky/near ground stays blank
     density := clamp(mist + fog_amount * 0.4, 0, 1)
     char_idx := clamp(int(density * f64(len(FOG_CHARS))), 0, len(FOG_CHARS) - 1)
 
-    fg := u8(clamp(mix(FOG_COLOR[0], 255, fog_amount * 0.3), 0, 255))
+    fg := clamp_u8(mix(FOG_COLOR[0], 255, fog_amount * 0.3))
 
     return models.Cell{
         bg = models.RGB{r, g, b},

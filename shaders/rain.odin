@@ -22,7 +22,7 @@ shader_rain :: proc(input: models.Shading_Input) -> models.Cell {
         return models.Cell{bg = models.RGB{8, 10, 18}, char = ' '}
     }
 
-    brightness := u8(clamp(140 + hash(x, math.floor(y)) * 115, 0, 255))
+    brightness := clamp_u8(140 + hash(x, math.floor(y)) * 115)
     char_idx := clamp(int(col_seed * f64(len(RAIN_CHARS))), 0, len(RAIN_CHARS)-1)
 
     return models.Cell{
