@@ -26,6 +26,7 @@ run :: proc(opts: ^models.Options) {
     
 
     current_shader := 0
+    update_title_to_shader(current_shader)
     global_builder := strings.builder_make()
     defer strings.builder_destroy(&global_builder)
 
@@ -51,11 +52,11 @@ run :: proc(opts: ^models.Options) {
                 case .Arrow_Right:
                     current_shader += 1
                     current_shader = wrap_index(current_shader, shaders_num)
-
+                    update_title_to_shader(current_shader)
                 case .Arrow_Left:
                     current_shader -= 1
                     current_shader = wrap_index(current_shader, shaders_num)
-
+                    update_title_to_shader(current_shader)
                 case .Arrow_Up, .Arrow_Down, .None:
                     // unused
                 }

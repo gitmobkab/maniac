@@ -1,9 +1,11 @@
 package app
 
-import "core:os"
+import "core:strings"
 
 import "../shaders"
 import "../terminal"
+
+TITLE_PREFIX :: "maniac - "
 
 /*
     Wanted to use the x %= limit trick but Odin modulo follows C style
@@ -21,7 +23,7 @@ wrap_index :: proc(index, count: int) -> int {
     Today tips, become a hater of string concatenation
 */
 update_title_to_shader :: proc(shader_id: int) {
-    os.write_string(os.stdout, "maniac - ")
-    shader_name := shaders.SHADERS[shader_id].name
-    terminal.set_title_to(shader_name)
+    title := strings.concatenate({TITLE_PREFIX, shaders.SHADERS[shader_id].name})
+    defer delete(title)
+    terminal.set_title_to(title)
 }
