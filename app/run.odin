@@ -50,8 +50,12 @@ run :: proc(opts: ^models.Options) {
                     }
                 case .Arrow_Right:
                     current_shader += 1
+                    current_shader = wrap_index(current_shader, shaders_num)
+
                 case .Arrow_Left:
                     current_shader -= 1
+                    current_shader = wrap_index(current_shader, shaders_num)
+
                 case .Arrow_Up, .Arrow_Down, .None:
                     // unused
                 }
