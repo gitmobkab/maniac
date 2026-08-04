@@ -1,5 +1,10 @@
 package app
 
+import "core:os"
+
+import "../shaders"
+import "../terminal"
+
 /*
     Wanted to use the x %= limit trick but Odin modulo follows C style
     Which the prevent the wraping to actually do it's job once the index goes negative.
@@ -9,4 +14,14 @@ package app
 */
 wrap_index :: proc(index, count: int) -> int {
     return (index % count + count) % count
+}
+
+/*
+    Utils 101
+    Today tips, become a hater of string concatenation
+*/
+update_title_to_shader :: proc(shader_id: int) {
+    os.write_string(os.stdout, "maniac - ")
+    shader_name := shaders.SHADERS[shader_id].name
+    terminal.set_title_to(shader_name)
 }
