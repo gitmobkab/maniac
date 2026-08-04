@@ -15,7 +15,8 @@ SHOW_CURSOR_SEQ :: ansi.CSI + ansi.DECTCEM_SHOW
 HIDE_CURSOR_SEQ :: ansi.CSI + ansi.DECTCEM_HIDE
 
 global_term := Terminal {
-    should_quit = false
+    should_quit = false,
+    focused = true,
 }
 
 // rows and cols are optionals fallbacks
@@ -25,7 +26,8 @@ init :: proc(rows: int = DEFAULT_ROWS, cols: int = DEFAULT_COLUMNS) {
 
     init_raw_mode()
     start_alt_mode()
-    
+    enable_focus_reporting()
+
     // should fix the issue on windows and other terminals
     hide_cursor()
 
@@ -38,6 +40,7 @@ cleanup :: proc() {
     defer restore_cooked_mode()
     defer stop_alt_mode()
     defer show_cursor()
+    defer disable_focus_reporting()
 }
 
 hide_cursor :: proc() {
