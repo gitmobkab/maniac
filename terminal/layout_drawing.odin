@@ -1,6 +1,7 @@
 package terminal
 
 import "core:terminal/ansi"
+import "core:strconv"
 import "core:strings"
 
 import "../shaders"
@@ -21,6 +22,7 @@ ERASE_FULL_LINE :: ansi.CSI + "2" + ansi.EL
 HEADER_BOTTOM_CHAR :: "▁"
 FOOTER_TOP_CHAR :: "▔"
 FOOTER_PADDING :: 5
+FOOTER_GAP :: 2 // minimum blank columns between the command legend and the elapsed-time stat
 FOOTER_TRUNC_INDICATOR :: "…"
 FOOTER_TAB_WIDTH :: 8 // conservative estimate, tabs don't have a fixed visible width
 ELAPSED_LABEL :: "Elapsed Time: "
@@ -32,7 +34,15 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
     shader := shaders.SHADERS[shader_id]
     target_row := get_target_row(height)
     width := global_term.columns
-    target_column := ceil_div(width, 2) - (len(shader.name) / 2) // ignore pls
+
+    id_buf, count_buf: [8]u8
+    id_str := strconv.write_int(id_buf[:], i64(shader_id+1), 10)
+    count_str := strconv.write_int(count_buf[:], i64(len(shaders.SHADERS)), 10)
+
+    // full visible label is "<name> [<id>/<count>]", not just the name
+    label_width := len(shader.name) + len(" [") + len(id_str) + len("/") + len(count_str) + len("]")
+    target_column := (width - label_width) / 2 + 1
+
     if height == 0 {
         return
     }
@@ -43,14 +53,14 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
         strings.write_string(builder, ERASE_FULL_LINE)
 
         set_bg_color_to(builder, HEADER_FOOTER_BG)
-        
+
         if row == target_row {
             move_cursor_to(builder, row, target_column)
             strings.write_string(builder, shader.name)
             strings.write_string(builder, " [")
-            strings.write_int(builder, shader_id+1)
+            strings.write_string(builder, id_str)
             strings.write_string(builder, "/")
-            strings.write_int(builder, len(shaders.SHADERS))
+            strings.write_string(builder, count_str)
             strings.write_string(builder, "]")
         } else if row == height{
             set_fg_color_to(builder, GENERIC_WHITE)
@@ -65,6 +75,15 @@ draw_footer :: proc(builder: ^strings.Builder, height: int, elapsed_time: f64) {
     row_end := global_term.rows
     target_row := row_start + height / 2
     width := global_term.columns
+
+    elapsed_buf: [32]u8
+    elapsed_str := strconv.write_float(elapsed_buf[:], elapsed_time, 'f', 2, 64)
+    if len(elapsed_str) > 1 && elapsed_str[0] == '+' && elapsed_str[1] != 'I' {
+        elapsed_str = elapsed_str[1:]
+    }
+    suffix_width := len(ELAPSED_LABEL) + len(elapsed_str)
+    elapsed_column := width - FOOTER_PADDING - suffix_width + 1
+
     for row in row_start..=row_end {
         move_cursor_to(builder, row)
         strings.write_string(builder, ERASE_FULL_LINE)
@@ -76,10 +95,11 @@ draw_footer :: proc(builder: ^strings.Builder, height: int, elapsed_time: f64) {
             strings.write_string(builder, strings.repeat(FOOTER_TOP_CHAR, width))
         } else if row == target_row {
             move_cursor_to(builder, row, FOOTER_PADDING)
-            write_commands(builder, width - FOOTER_PADDING)
+            write_commands(builder, elapsed_column - FOOTER_GAP - FOOTER_PADDING)
 
+            move_cursor_to(builder, row, elapsed_column)
             strings.write_string(builder, ELAPSED_LABEL)
-            strings.write_float(builder, elapsed_time, 'f', 2, 64)
+            strings.write_string(builder, elapsed_str)
         }
     }
 }
@@ -105,6 +125,18 @@ write_commands :: proc(builder: ^strings.Builder, max_width: int) {
         strings.write_string(builder, "\t")
         used += entry_width
     }
+}
+
+// fills the entire terminal with a flat dim color, used while unfocused
+draw_dim_screen :: proc(builder: ^strings.Builder) {
+    width := global_term.columns
+    for row in 1..=global_term.rows {
+        move_cursor_to(builder, row)
+        strings.write_string(builder, ERASE_FULL_LINE)
+        set_bg_color_to(builder, DIM_BG)
+        strings.write_string(builder, strings.repeat(" ", width))
+    }
+    reset_all(builder)
 }
 
 get_target_row :: proc(height: int) -> int {

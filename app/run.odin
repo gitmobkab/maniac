@@ -24,7 +24,6 @@ run :: proc(opts: ^models.Options) {
     target_fps := opts.fps
     target_frame_time := time.Duration(f64(time.Second) / f64(target_fps))
     
-
     current_shader := 0
     update_title_to_shader(current_shader)
     global_builder := strings.builder_make()
@@ -61,34 +60,43 @@ run :: proc(opts: ^models.Options) {
                     // unused
                 }
             case .Focus:
+                was_focused := term.focused
                 term.focused = event.focus == .In
+                if was_focused && !term.focused {
+                    terminal.draw_dim_screen(&global_builder)
+                    os.write_string(os.stdout, strings.to_string(global_builder))
+                }
             }
         }
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
 
-        current_shader = wrap_index(current_shader, shaders_num)
-        
-        if opts.headless {
-            header_height = 0
-            footer_height = 0
-        } else {
-            header_height = DEFAULT_HEADER_HEIGHT
-            footer_height = DEFAULT_FOOTER_HEIGHT 
-        }
-        render_params.row_start = header_height + 1
-        render_params.row_end = term.rows - footer_height
-        render_params.column_end = term.columns
+        if term.focused {
+            current_shader = wrap_index(current_shader, shaders_num)
 
-        terminal.draw_header(&global_builder, header_height, current_shader)
-        terminal.draw_footer(&global_builder, footer_height, elapsed)
-        render_frame(render_params, elapsed, current_shader)
+            if opts.headless {
+                header_height = 0
+                footer_height = 0
+            } else {
+                header_height = DEFAULT_HEADER_HEIGHT
+                footer_height = DEFAULT_FOOTER_HEIGHT
+            }
+            render_params.row_start = header_height + 1
+            render_params.row_end = term.rows - footer_height
+            render_params.column_end = term.columns
+
+            terminal.draw_header(&global_builder, header_height, current_shader)
+            terminal.draw_footer(&global_builder, footer_height, elapsed)
+            render_frame(render_params, elapsed, current_shader)
+        }
 
         frame_elapsed := time.since(frame_start)
         remaining := target_frame_time - frame_elapsed
         if remaining > 0 {
             time.accurate_sleep(remaining)
         }
-        os.write_string(os.stdout, strings.to_string(global_builder))
+        if term.focused {
+            os.write_string(os.stdout, strings.to_string(global_builder))
+        }
     }
 }

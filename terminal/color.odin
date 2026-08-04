@@ -10,6 +10,7 @@ import "../models"
 HEADER_FOOTER_BG :: models.RGB{41, 41, 41}
 GENERIC_WHITE :: models.RGB{255, 255, 255}
 BLUEISH :: models.RGB{164, 184, 242}
+DIM_BG :: models.RGB{20, 20, 20}
 // </COLORS>
 
 // followed by r;g;b where r,g,b are in 0..=255 (red-green-blue)
