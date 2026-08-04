@@ -127,16 +127,110 @@ write_commands :: proc(builder: ^strings.Builder, max_width: int) {
     }
 }
 
-// fills the entire terminal with a flat dim color, used while unfocused
+PAUSED_TITLE :: "PAUSED"
+PAUSED_LINE_1 :: "i'm a Maniac but you still got to"
+PAUSED_LINE_2 :: "focus on me"
+PAUSED_HINT :: "disable with flag '--shut-up'"
+PAUSED_CARD_PADDING :: 2
+
+BOX_TOP_LEFT :: "┌"
+BOX_TOP_RIGHT :: "┐"
+BOX_BOTTOM_LEFT :: "└"
+BOX_BOTTOM_RIGHT :: "┘"
+BOX_HORIZONTAL :: "─"
+BOX_VERTICAL :: "│"
+
+Paused_Card_Line :: struct {
+    text: string,
+    is_hint: bool,
+}
+
+PAUSED_CARD_LINES := [?]Paused_Card_Line{
+    {PAUSED_TITLE, false},
+    {"", false},
+    {PAUSED_LINE_1, false},
+    {PAUSED_LINE_2, false},
+    {"", false},
+    {PAUSED_HINT, true},
+}
+
+// dims the whole terminal and shows a centered "paused" card, used while unfocused
 draw_dim_screen :: proc(builder: ^strings.Builder) {
     width := global_term.columns
-    for row in 1..=global_term.rows {
+    height := global_term.rows
+
+    for row in 1..=height {
         move_cursor_to(builder, row)
         strings.write_string(builder, ERASE_FULL_LINE)
         set_bg_color_to(builder, DIM_BG)
         strings.write_string(builder, strings.repeat(" ", width))
     }
+
+    content_width := 0
+    for line in PAUSED_CARD_LINES {
+        content_width = max(content_width, len(line.text))
+    }
+    inner_width := content_width + PAUSED_CARD_PADDING * 2
+    box_width := inner_width + 2
+    box_height := len(PAUSED_CARD_LINES) + PAUSED_CARD_PADDING * 2 + 2
+
+    box_row := (height - box_height) / 2 + 1
+    box_col := (width - box_width) / 2 + 1
+
+    move_cursor_to(builder, box_row, box_col)
+    set_bg_color_to(builder, PAUSED_CARD_BG)
+    set_fg_color_to(builder, PAUSED_CARD_FG)
+    strings.write_string(builder, BOX_TOP_LEFT)
+    strings.write_string(builder, strings.repeat(BOX_HORIZONTAL, inner_width))
+    strings.write_string(builder, BOX_TOP_RIGHT)
+
+    row := box_row + 1
+    for _ in 0..<PAUSED_CARD_PADDING {
+        draw_paused_card_blank_row(builder, row, box_col, inner_width)
+        row += 1
+    }
+
+    for line in PAUSED_CARD_LINES {
+        move_cursor_to(builder, row, box_col)
+        set_bg_color_to(builder, PAUSED_CARD_BG)
+        set_fg_color_to(builder, PAUSED_CARD_FG)
+        strings.write_string(builder, BOX_VERTICAL)
+
+        left_pad := (inner_width - len(line.text)) / 2
+        right_pad := inner_width - len(line.text) - left_pad
+        strings.write_string(builder, strings.repeat(" ", left_pad))
+
+        set_fg_color_to(builder, PAUSED_HINT_FG if line.is_hint else PAUSED_CARD_FG)
+        strings.write_string(builder, line.text)
+
+        set_fg_color_to(builder, PAUSED_CARD_FG)
+        strings.write_string(builder, strings.repeat(" ", right_pad))
+        strings.write_string(builder, BOX_VERTICAL)
+        row += 1
+    }
+
+    for _ in 0..<PAUSED_CARD_PADDING {
+        draw_paused_card_blank_row(builder, row, box_col, inner_width)
+        row += 1
+    }
+
+    move_cursor_to(builder, row, box_col)
+    set_bg_color_to(builder, PAUSED_CARD_BG)
+    set_fg_color_to(builder, PAUSED_CARD_FG)
+    strings.write_string(builder, BOX_BOTTOM_LEFT)
+    strings.write_string(builder, strings.repeat(BOX_HORIZONTAL, inner_width))
+    strings.write_string(builder, BOX_BOTTOM_RIGHT)
+
     reset_all(builder)
+}
+
+@(private)
+draw_paused_card_blank_row :: proc(builder: ^strings.Builder, row, col, inner_width: int) {
+    move_cursor_to(builder, row, col)
+    set_bg_color_to(builder, PAUSED_CARD_BG)
+    strings.write_string(builder, BOX_VERTICAL)
+    strings.write_string(builder, strings.repeat(" ", inner_width))
+    strings.write_string(builder, BOX_VERTICAL)
 }
 
 get_target_row :: proc(height: int) -> int {

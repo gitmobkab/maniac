@@ -10,7 +10,10 @@ import "../models"
 HEADER_FOOTER_BG :: models.RGB{41, 41, 41}
 GENERIC_WHITE :: models.RGB{255, 255, 255}
 BLUEISH :: models.RGB{164, 184, 242}
-DIM_BG :: models.RGB{20, 20, 20}
+DIM_BG :: models.RGB{52, 58, 64}
+PAUSED_CARD_BG :: models.RGB{233, 236, 239}
+PAUSED_CARD_FG :: models.RGB{30, 30, 30}
+PAUSED_HINT_FG :: models.RGB{25, 113, 194}
 // </COLORS>
 
 // followed by r;g;b where r,g,b are in 0..=255 (red-green-blue)

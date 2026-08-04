@@ -62,7 +62,7 @@ run :: proc(opts: ^models.Options) {
             case .Focus:
                 was_focused := term.focused
                 term.focused = event.focus == .In
-                if was_focused && !term.focused {
+                if !opts.shut_up && was_focused && !term.focused {
                     terminal.draw_dim_screen(&global_builder)
                     os.write_string(os.stdout, strings.to_string(global_builder))
                 }
@@ -71,7 +71,8 @@ run :: proc(opts: ^models.Options) {
         frame_start := time.now()
         elapsed := time.duration_seconds(time.since(start_time))
 
-        if term.focused {
+        should_render := term.focused || opts.shut_up
+        if should_render {
             current_shader = wrap_index(current_shader, shaders_num)
 
             if opts.headless {
@@ -95,7 +96,7 @@ run :: proc(opts: ^models.Options) {
         if remaining > 0 {
             time.accurate_sleep(remaining)
         }
-        if term.focused {
+        if should_render {
             os.write_string(os.stdout, strings.to_string(global_builder))
         }
     }
