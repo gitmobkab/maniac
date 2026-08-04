@@ -68,6 +68,14 @@ install_resize_handler :: proc() {
     // windows doesn't actually use a signal to handle window resize
 }
 
+enable_focus_reporting :: proc() {
+    // windows delivers FOCUS_EVENT_RECORD natively through the console input
+    // buffer, no VT opt-in sequence needed (same as window-resize events)
+}
+
+disable_focus_reporting :: proc() {
+}
+
 
 update_window_size :: proc() {
     stdout_h := win.GetStdHandle(win.STD_OUTPUT_HANDLE)
@@ -79,18 +87,18 @@ update_window_size :: proc() {
 }
 
 /*
-    Handle complex (stupid) parsing logic for terminal keys 
+    Handle complex (stupid) parsing logic for terminal keys and focus events
 
     obscure: handle windows resize event
 */
-poll_key :: proc() -> (Key_Event, bool) {
+poll_event :: proc() -> (Event, bool) {
     stdin_h := get_stdin_handle()
 
     for {
         number_of_events: win.DWORD
         win.GetNumberOfConsoleInputEvents(stdin_h, &number_of_events)
         if number_of_events == 0 {
-            return Key_Event{}, false
+            return Event{}, false
         }
 
         record: win.INPUT_RECORD
@@ -104,6 +112,10 @@ poll_key :: proc() -> (Key_Event, bool) {
             global_term.rows = int(size.Y)
             // no key to report yet, loop again for the next queued event
 
+        case .FOCUS_EVENT:
+            focus_event := record.Event.FocusEvent
+            return Event{kind = .Focus, focus = .In if bool(focus_event.bSetFocus) else .Out}, true
+
         case .KEY_EVENT:
             key_event := record.Event.KeyEvent
             if !bool(key_event.bKeyDown) {
@@ -111,19 +123,19 @@ poll_key :: proc() -> (Key_Event, bool) {
             }
             switch key_event.wVirtualKeyCode {
             case win.VK_LEFT:
-                return Key_Event{key = .Arrow_Left}, true
+                return Event{kind = .Key, key = .Arrow_Left}, true
             case win.VK_RIGHT:
-                return Key_Event{key = .Arrow_Right}, true
+                return Event{kind = .Key, key = .Arrow_Right}, true
             case win.VK_UP:
-                return Key_Event{key = .Arrow_Up}, true
+                return Event{kind = .Key, key = .Arrow_Up}, true
             case win.VK_DOWN:
-                return Key_Event{key = .Arrow_Down}, true
+                return Event{kind = .Key, key = .Arrow_Down}, true
             case:
-                return Key_Event{key = .Char, char = rune(key_event.uChar.UnicodeChar)}, true
+                return Event{kind = .Key, key = .Char, char = rune(key_event.uChar.UnicodeChar)}, true
             }
 
         case:
-            // MOUSE_EVENT / MENU_EVENT / FOCUS_EVENT — not interesting, loop again
+            // MOUSE_EVENT / MENU_EVENT — not interesting, loop again
         }
     }
 }
