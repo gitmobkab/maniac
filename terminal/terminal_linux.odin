@@ -3,6 +3,11 @@ package terminal
 import "core:os"
 import "core:sys/posix"
 import "core:sys/linux"
+import "core:terminal/ansi"
+
+// DECSET 1004: ask the terminal to report focus in/out as CSI I / CSI O on stdin.
+FOCUS_REPORTING_ON_SEQ :: ansi.CSI + "?1004h"
+FOCUS_REPORTING_OFF_SEQ :: ansi.CSI + "?1004l"
 
 // interface required by linux; does not advice any module to use it
 Winsize :: struct {
@@ -84,6 +89,14 @@ install_resize_handler :: proc() {
     linux.rt_sigaction(.SIGWINCH, &action, nil)
 }
 
+enable_focus_reporting :: proc() {
+    os.write_string(os.stdout, FOCUS_REPORTING_ON_SEQ)
+}
+
+disable_focus_reporting :: proc() {
+    os.write_string(os.stdout, FOCUS_REPORTING_OFF_SEQ)
+}
+
 install_sigint_handler :: proc() {
     action: posix.sigaction_t
     action.sa_handler = sigint_handler
@@ -95,15 +108,15 @@ sigint_handler :: proc "c" (_: posix.Signal) {
 }
 
 /*
-    Handle complex (stupid) parsing logic for terminal keys
+    Handle complex (stupid) parsing logic for terminal keys and focus events
 
     obscure: handle windows resize event
 */
-poll_key :: proc() -> (Key_Event, bool) {
+poll_event :: proc() -> (Event, bool) {
     key_buf: [1]byte
     n, _ := os.read(os.stdin, key_buf[:])
     if n <= 0 {
-        return Key_Event{}, false
+        return Event{}, false
     }
 
     key := key_buf[0]
@@ -113,17 +126,21 @@ poll_key :: proc() -> (Key_Event, bool) {
         if esc_n == 2 && seq_buf[0] == '[' {
             switch seq_buf[1] {
             case 'C':
-                return Key_Event{key = .Arrow_Right}, true
+                return Event{kind = .Key, key = .Arrow_Right}, true
             case 'D':
-                return Key_Event{key = .Arrow_Left}, true
+                return Event{kind = .Key, key = .Arrow_Left}, true
             case 'A':
-                return Key_Event{key = .Arrow_Up}, true
+                return Event{kind = .Key, key = .Arrow_Up}, true
             case 'B':
-                return Key_Event{key = .Arrow_Down}, true
+                return Event{kind = .Key, key = .Arrow_Down}, true
+            case 'I':
+                return Event{kind = .Focus, focus = .In}, true
+            case 'O':
+                return Event{kind = .Focus, focus = .Out}, true
             }
         }
-        return Key_Event{}, false
+        return Event{}, false
     }
 
-    return Key_Event{key = .Char, char = rune(key)}, true
+    return Event{kind = .Key, key = .Char, char = rune(key)}, true
 }
