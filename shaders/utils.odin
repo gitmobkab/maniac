@@ -37,6 +37,10 @@ SHADERS := [?]Shader{
     {"voronoi", shader_voronoi},
 }
 
+clamp_u8 :: proc(val: $T) -> u8{
+    return u8(clamp(val, 0, 255))
+}
+
 value_noise :: proc(x, y: f64) -> f64 {
     ix, iy := math.floor(x), math.floor(y)
     fx, fy := x - ix, y - iy
