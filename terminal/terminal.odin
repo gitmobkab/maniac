@@ -13,6 +13,7 @@ START_ALT_MODE_SEQ :: ansi.CSI + "?1049h"
 STOP_ALT_MODE_SEQ :: ansi.CSI + "?1049l"
 SHOW_CURSOR_SEQ :: ansi.CSI + ansi.DECTCEM_SHOW
 HIDE_CURSOR_SEQ :: ansi.CSI + ansi.DECTCEM_HIDE
+OSC_WINDOW_TITLE :: ansi.OSC + ansi.WINDOW_TITLE + ";"
 
 global_term := Terminal {
     should_quit = false,
@@ -49,6 +50,13 @@ hide_cursor :: proc() {
 
 show_cursor :: proc() {
     os.write_string(os.stdout, SHOW_CURSOR_SEQ)
+}
+
+// set the terminal window/tab title (OSC 2)
+set_title_to :: proc(title: string) {
+    os.write_string(os.stdout, OSC_WINDOW_TITLE)
+    os.write_string(os.stdout, title)
+    os.write_string(os.stdout, ansi.ST)
 }
 
 /*
