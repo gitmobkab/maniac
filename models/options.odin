@@ -3,7 +3,7 @@ package models
 Options :: struct {
     version: bool `usage:"Show the project version and exit"`,
     headless: bool `usage:"Run in headless mode."`,
-    fps: i32 `usage:"The target fps (Frame Per Second) to use. Negative to go uncapped. Default: 60"`,
+    fps: i32 `usage:"The target fps (Frame Per Second) to use. x <= 0 to go uncapped (i think). Default: 60"`,
     shut_up: bool `usage:"Keep rendering normally even when the terminal loses focus."`,
 }
 
