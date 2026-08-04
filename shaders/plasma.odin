@@ -31,9 +31,11 @@ shader_plasma :: proc(input: models.Shading_Input) -> models.Cell {
     blue  = mix(blue, luminance, desaturation)
 
     return models.Cell{
-        bg_r = u8(clamp(red, 0, 255)),
-        bg_g = u8(clamp(green, 0, 255)),
-        bg_b = u8(clamp(blue, 0, 255)),
+        bg = models.RGB{
+            u8(clamp(red, 0, 255)),
+            u8(clamp(green, 0, 255)),
+            u8(clamp(blue, 0, 255)),
+        },
         char = ' ',
     }
 }

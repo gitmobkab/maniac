@@ -24,9 +24,7 @@ shader_tunnel :: proc(input: models.Shading_Input) -> models.Cell {
     blue := u8(clamp((math.sin(hue_shift + 2.0) + 1) * f64(intensity) / 2, 0, 255))
 
     return models.Cell{
-        bg_r = red,
-        bg_g = intensity,
-        bg_b = blue,
+        bg = models.RGB{red, intensity, blue},
         char = ' ',
     }
 }

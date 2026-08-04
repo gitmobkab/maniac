@@ -26,9 +26,11 @@ shader_aurora :: proc(input: models.Shading_Input) -> models.Cell {
     blue  := AURORA_BASE[2] + (math.sin(hue + 4.0) * 0.5 + 0.5) * curtain * 220
 
     return models.Cell{
-        bg_r = u8(clamp(red, 0, 255)),
-        bg_g = u8(clamp(green, 0, 255)),
-        bg_b = u8(clamp(blue, 0, 255)),
+        bg = models.RGB{ 
+            u8(clamp(red, 0, 255)),
+            u8(clamp(green, 0, 255)),
+            u8(clamp(blue, 0, 255)),
+        },
         char = ' ',
     }
 }

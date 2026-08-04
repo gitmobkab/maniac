@@ -50,9 +50,9 @@ shader_creation :: proc(input: models.Shading_Input) -> models.Cell {
     blue  := u8(clamp((c[2] / l) * 255, 0, 255))
 
     return models.Cell{
-        bg_r = red,
-        bg_g = green,
-        bg_b = blue,
+        bg = models.RGB{
+            red, green, blue
+        },
         char = ' ',
     }
 }

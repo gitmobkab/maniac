@@ -36,16 +36,16 @@ shader_matrix :: proc(input: models.Shading_Input) -> models.Cell {
     is_head := dist_from_head < 1.0
     if is_head {
         return models.Cell{
-            bg_r = 0, bg_g = 0, bg_b = 0,
-            fg_r = 200, fg_g = 255, fg_b = 200,
+            bg = models.RGB{0, 0, 0},
+            fg = models.RGB{200, 255, 200},
             char = char,
         } // bright white-green head
     }
 
     green := u8(clamp(trail * 255, 0, 255))
     return models.Cell{
-        bg_r = 0, bg_g = 0, bg_b = 0,
-        fg_r = 0, fg_g = green, fg_b = 0,
+        bg = models.RGB{0, 0, 0},
+        fg = models.RGB{0, green, 0},
         char = char,
     }
 }

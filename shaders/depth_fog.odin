@@ -35,8 +35,8 @@ shader_depth_fog :: proc(input: models.Shading_Input) -> models.Cell {
     fg := u8(clamp(mix(FOG_COLOR[0], 255, fog_amount * 0.3), 0, 255))
 
     return models.Cell{
-        bg_r = r, bg_g = g, bg_b = b,
-        fg_r = fg, fg_g = fg, fg_b = fg,
+        bg = models.RGB{r, g, b},
+        fg = models.RGB{fg, fg, fg},
         char = FOG_CHARS[char_idx],
     }
 }

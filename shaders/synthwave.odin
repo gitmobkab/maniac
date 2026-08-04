@@ -32,17 +32,21 @@ shader_synthwave :: proc(input: models.Shading_Input) -> models.Cell {
         in_lower_half := y > horizon - sun_radius*0.5
         if in_sun && (!in_lower_half || !scanline) {
             return models.Cell{
-                bg_r = u8(clamp(SYNTHWAVE_SUN_COLOR[0], 0, 255)),
-                bg_g = u8(clamp(SYNTHWAVE_SUN_COLOR[1], 0, 255)),
-                bg_b = u8(clamp(SYNTHWAVE_SUN_COLOR[2], 0, 255)),
+                bg = models.RGB{
+                    u8(clamp(SYNTHWAVE_SUN_COLOR[0], 0, 255)),
+                    u8(clamp(SYNTHWAVE_SUN_COLOR[1], 0, 255)),
+                    u8(clamp(SYNTHWAVE_SUN_COLOR[2], 0, 255)),
+                },
                 char = ' ',
             }
         }
 
         return models.Cell{
-            bg_r = u8(clamp(r, 0, 255)),
-            bg_g = u8(clamp(g, 0, 255)),
-            bg_b = u8(clamp(b, 0, 255)),
+            bg = models.RGB{
+                u8(clamp(r, 0, 255)),
+                u8(clamp(g, 0, 255)),
+                u8(clamp(b, 0, 255)),
+            },
             char = ' ',
         }
     }
@@ -66,13 +70,15 @@ shader_synthwave :: proc(input: models.Shading_Input) -> models.Cell {
 
     if is_horizontal_line || is_vertical_line {
         return models.Cell{
-            bg_r = 10, bg_g = 5, bg_b = 20,
-            fg_r = u8(clamp(SYNTHWAVE_GRID_COLOR[0]*fade, 0, 255)),
-            fg_g = u8(clamp(SYNTHWAVE_GRID_COLOR[1]*fade, 0, 255)),
-            fg_b = u8(clamp(SYNTHWAVE_GRID_COLOR[2]*fade, 0, 255)),
+            bg = models.RGB{10, 5, 20},
+            fg = models.RGB{
+                u8(clamp(SYNTHWAVE_GRID_COLOR[0]*fade, 0, 255)),
+                u8(clamp(SYNTHWAVE_GRID_COLOR[1]*fade, 0, 255)),
+                u8(clamp(SYNTHWAVE_GRID_COLOR[2]*fade, 0, 255)),
+            },
             char = '-',
         }
     }
 
-    return models.Cell{bg_r = 10, bg_g = 5, bg_b = 20, char = ' '}
+    return models.Cell{bg = models.RGB{10, 5, 20}, char = ' '}
 }

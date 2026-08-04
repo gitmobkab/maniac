@@ -28,16 +28,16 @@ shader_dna :: proc(input: models.Shading_Input) -> models.Cell {
     if dist_a < 0.6 {
         glow: u8 = 255 if front_is_a else 130
         return models.Cell{
-            bg_r = 0, bg_g = 0, bg_b = 0,
-            fg_r = glow, fg_g = u8(f64(glow) * 0.4), fg_b = glow,
+            bg = models.RGB{0, 0, 0},
+            fg = models.RGB{glow, u8(f64(glow) * 0.4), glow},
             char = DNA_STRAND_CHAR_A,
         }
     }
     if dist_b < 0.6 {
         glow: u8 = 130 if front_is_a else 255
         return models.Cell{
-            bg_r = 0, bg_g = 0, bg_b = 0,
-            fg_r = u8(f64(glow) * 0.4), fg_g = glow, fg_b = glow,
+            bg = models.RGB{0, 0, 0},
+            fg = models.RGB{u8(f64(glow) * 0.4), glow, glow},
             char = DNA_STRAND_CHAR_B,
         }
     }
@@ -46,8 +46,8 @@ shader_dna :: proc(input: models.Shading_Input) -> models.Cell {
     between := x > min(strand_a, strand_b) && x < max(strand_a, strand_b)
     rung_row := int(math.floor(y)) % 4 == 0
     if between && rung_row {
-        return models.Cell{bg_r = 0, bg_g = 0, bg_b = 0, fg_r = 120, fg_g = 120, fg_b = 140, char = DNA_RUNG_CHAR}
+        return models.Cell{bg = models.RGB{0, 0, 0}, fg = models.RGB{120, 120, 140}, char = DNA_RUNG_CHAR}
     }
 
-    return models.Cell{bg_r = 0, bg_g = 0, bg_b = 0, char = ' '}
+    return models.Cell{bg = models.RGB{0, 0, 0}, char = ' '}
 }

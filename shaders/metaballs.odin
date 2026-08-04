@@ -44,9 +44,7 @@ shader_metaballs :: proc(input: models.Shading_Input) -> models.Cell {
     blue  := u8(clamp((inside * 0.6 + glow * 0.9) * 255, 0, 255))
 
     return models.Cell{
-        bg_r = red,
-        bg_g = green,
-        bg_b = blue,
+        bg = models.RGB{red, green, blue},
         char = ' ',
     }
 }

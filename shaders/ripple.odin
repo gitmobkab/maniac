@@ -39,8 +39,8 @@ shader_ripple :: proc(input: models.Shading_Input) -> models.Cell {
     char_idx := clamp(int(brightness * f64(len(RIPPLE_CHARS))), 0, len(RIPPLE_CHARS)-1)
 
     return models.Cell{
-        bg_r = red, bg_g = green, bg_b = blue,
-        fg_r = 255, fg_g = 255, fg_b = 255,
+        bg = models.RGB{red, green, blue},
+        fg = models.RGB{255, 255, 255},
         char = RIPPLE_CHARS[char_idx],
     }
 }

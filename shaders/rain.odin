@@ -19,15 +19,15 @@ shader_rain :: proc(input: models.Shading_Input) -> models.Cell {
     is_drop := drop_phase < 1.0
 
     if !is_drop {
-        return models.Cell{bg_r = 8, bg_g = 10, bg_b = 18, char = ' '}
+        return models.Cell{bg = models.RGB{8, 10, 18}, char = ' '}
     }
 
     brightness := u8(clamp(140 + hash(x, math.floor(y)) * 115, 0, 255))
     char_idx := clamp(int(col_seed * f64(len(RAIN_CHARS))), 0, len(RAIN_CHARS)-1)
 
     return models.Cell{
-        bg_r = 8, bg_g = 10, bg_b = 18,
-        fg_r = u8(f64(brightness) * 0.6), fg_g = u8(f64(brightness) * 0.75), fg_b = brightness,
+        bg = models.RGB{8, 10, 18},
+        fg = models.RGB{u8(f64(brightness) * 0.6), u8(f64(brightness) * 0.75), brightness},
         char = RAIN_CHARS[char_idx],
     }
 }

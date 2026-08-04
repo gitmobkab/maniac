@@ -79,9 +79,11 @@ shader_balatro :: proc(input: models.Shading_Input) -> models.Cell {
     b := base*COLOUR_1.z + rem*(COLOUR_1.z*c1p + COLOUR_2.z*c2p + c3p*COLOUR_3.z) + light
 
     return models.Cell{
-        bg_r = u8(clamp(r*255, 0, 255)),
-        bg_g = u8(clamp(g*255, 0, 255)),
-        bg_b = u8(clamp(b*255, 0, 255)),
+        bg = models.RGB{
+            u8(clamp(r*255, 0, 255)),
+            u8(clamp(g*255, 0, 255)),
+            u8(clamp(b*255, 0, 255))
+        },
         char = ' ',
     }
 }

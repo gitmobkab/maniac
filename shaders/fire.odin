@@ -33,8 +33,8 @@ shader_fire :: proc(input: models.Shading_Input) -> models.Cell {
     char_idx := clamp(int(intensity * f64(len(FIRE_CHARS))), 0, len(FIRE_CHARS) - 1)
 
     return models.Cell{
-        bg_r = r, bg_g = g, bg_b = b,
-        fg_r = 255, fg_g = 255, fg_b = 200,
+        bg = models.RGB{r, g, b},
+        fg = models.RGB{255, 255, 200},
         char = FIRE_CHARS[char_idx],
     }
 }

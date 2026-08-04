@@ -33,9 +33,7 @@ shader_kaleidoscope :: proc(input: models.Shading_Input) -> models.Cell {
     blue  := u8(clamp((math.sin(v * math.PI * 2.0 + 4.0) + 1) * 127.5, 0, 255))
 
     return models.Cell{
-        bg_r = red,
-        bg_g = green,
-        bg_b = blue,
+        bg = models.RGB{red, green, blue},
         char = ' ',
     }
 }

@@ -15,7 +15,7 @@ shader_starfield :: proc(input: models.Shading_Input) -> models.Cell {
 
     seed := hash(cell_x, cell_y)
     if seed > STAR_DENSITY {
-        return models.Cell{bg_r = 0, bg_g = 0, bg_b = 0, char = ' '}
+        return models.Cell{bg = models.RGB{0, 0, 0}, char = ' '}
     }
 
     // Twinkle: brightness oscillates per-star at its own phase/speed
@@ -28,8 +28,8 @@ shader_starfield :: proc(input: models.Shading_Input) -> models.Cell {
     char_idx := clamp(int(seed / STAR_DENSITY * 3), 0, 2)
 
     return models.Cell{
-        bg_r = 0, bg_g = 0, bg_b = 0,
-        fg_r = brightness, fg_g = brightness, fg_b = brightness,
+        bg = models.RGB{0, 0, 0},
+        fg = models.RGB{brightness, brightness, brightness},
         char = chars[char_idx],
     }
 }

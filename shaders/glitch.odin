@@ -42,8 +42,8 @@ shader_glitch :: proc(input: models.Shading_Input) -> models.Cell {
     char_idx := clamp(int(intensity * f64(len(GLITCH_CHARS))), 0, len(GLITCH_CHARS)-1)
 
     return models.Cell{
-        bg_r = 0, bg_g = 0, bg_b = 0,
-        fg_r = red, fg_g = green, fg_b = blue,
+        bg = models.RGB{0, 0, 0},
+        fg = models.RGB{red, green, blue},
         char = GLITCH_CHARS[char_idx],
     }
 }
