@@ -35,23 +35,28 @@ run :: proc(opts: ^models.Options) {
     header_height, footer_height : int
     for !term.should_quit {
         strings.builder_reset(&global_builder)
-        event, ok := terminal.poll_key()
+        event, ok := terminal.poll_event()
 
         if ok {
-            switch event.key {
-            case .Char:
-                switch unicode.to_lower(event.char) {
-                case 'q':
-                    term.should_quit = true
-                case 'f':
-                    opts.headless = !opts.headless
+            switch event.kind {
+            case .Key:
+                switch event.key {
+                case .Char:
+                    switch unicode.to_lower(event.char) {
+                    case 'q':
+                        term.should_quit = true
+                    case 'f':
+                        opts.headless = !opts.headless
+                    }
+                case .Arrow_Right:
+                    current_shader += 1
+                case .Arrow_Left:
+                    current_shader -= 1
+                case .Arrow_Up, .Arrow_Down, .None:
+                    // unused
                 }
-            case .Arrow_Right:
-                current_shader += 1
-            case .Arrow_Left:
-                current_shader -= 1
-            case .Arrow_Up, .Arrow_Down, .None:
-                // unused
+            case .Focus:
+                term.focused = event.focus == .In
             }
         }
         frame_start := time.now()
