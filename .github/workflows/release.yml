@@ -27,7 +27,7 @@ jobs:
           if [ -z "$RAW" ]; then RAW="$GITHUB_REF_NAME"; fi
           echo "version=${RAW#v}" >> $GITHUB_OUTPUT
       - name: Build
-        run: odin build . -out:maniac-linux -define:VERSION=${{ steps.ver.outputs.version }}
+        run: odin build . -out:maniac-linux -o:speed -define:VERSION=${{ steps.ver.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: maniac-linux
@@ -51,7 +51,7 @@ jobs:
           if [ -z "$RAW" ]; then RAW="$GITHUB_REF_NAME"; fi
           echo "version=${RAW#v}" >> $GITHUB_OUTPUT
       - name: Build
-        run: odin build . -out:maniac-windows.exe -define:VERSION=${{ steps.ver.outputs.version }}
+        run: odin build . -out:maniac-windows.exe -o:speed -define:VERSION=${{ steps.ver.outputs.version }}
       - uses: actions/upload-artifact@v4
         with:
           name: maniac-windows
