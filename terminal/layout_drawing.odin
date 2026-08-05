@@ -5,7 +5,6 @@ import "core:strconv"
 import "core:strings"
 
 import "../shaders"
-import "../models"
 
 Command :: struct {
     key: rune,
@@ -18,6 +17,32 @@ COMMANDS := [?]Command{
     {'→', "next shader"},
     {'f', "Toggle headless mode"}
 }
+
+Paused_Card_Line :: struct {
+    text: string,
+    is_hint: bool,
+}
+
+PAUSED_CARD_LINES := [?]Paused_Card_Line{
+    {PAUSED_TITLE, false},
+    {"", false},
+    {PAUSED_LINE_1, false},
+    {PAUSED_LINE_2, false},
+    {"", false},
+    {PAUSED_HINT, true},
+}
+
+PAUSED_TITLE :: "PAUSED"
+PAUSED_LINE_1 :: "i'm a Maniac but you still got to"
+PAUSED_LINE_2 :: "focus on me"
+PAUSED_HINT :: "disable with flag '--shut-up'"
+PAUSED_CARD_PADDING :: 2
+BOX_TOP_LEFT :: "┌"
+BOX_TOP_RIGHT :: "┐"
+BOX_BOTTOM_LEFT :: "└"
+BOX_BOTTOM_RIGHT :: "┘"
+BOX_HORIZONTAL :: "─"
+BOX_VERTICAL :: "│"
 ERASE_FULL_LINE :: ansi.CSI + "2" + ansi.EL
 HEADER_BOTTOM_CHAR :: "▁"
 FOOTER_TOP_CHAR :: "▔"
@@ -64,7 +89,7 @@ draw_header :: proc(builder: ^strings.Builder, height, shader_id: int) {
             strings.write_string(builder, "]")
         } else if row == height{
             set_fg_color_to(builder, GENERIC_WHITE)
-            strings.write_string(builder, strings.repeat(HEADER_BOTTOM_CHAR, width))
+            write_repeated(builder, HEADER_BOTTOM_CHAR, width)
         }
     }
     reset_all(builder)
@@ -92,7 +117,7 @@ draw_footer :: proc(builder: ^strings.Builder, height: int, elapsed_time: f64) {
         set_fg_color_to(builder, GENERIC_WHITE)
 
         if row == row_start {
-            strings.write_string(builder, strings.repeat(FOOTER_TOP_CHAR, width))
+            write_repeated(builder, FOOTER_TOP_CHAR, width)
         } else if row == target_row {
             move_cursor_to(builder, row, FOOTER_PADDING)
             write_commands(builder, elapsed_column - FOOTER_GAP - FOOTER_PADDING)
@@ -127,32 +152,6 @@ write_commands :: proc(builder: ^strings.Builder, max_width: int) {
     }
 }
 
-PAUSED_TITLE :: "PAUSED"
-PAUSED_LINE_1 :: "i'm a Maniac but you still got to"
-PAUSED_LINE_2 :: "focus on me"
-PAUSED_HINT :: "disable with flag '--shut-up'"
-PAUSED_CARD_PADDING :: 2
-
-BOX_TOP_LEFT :: "┌"
-BOX_TOP_RIGHT :: "┐"
-BOX_BOTTOM_LEFT :: "└"
-BOX_BOTTOM_RIGHT :: "┘"
-BOX_HORIZONTAL :: "─"
-BOX_VERTICAL :: "│"
-
-Paused_Card_Line :: struct {
-    text: string,
-    is_hint: bool,
-}
-
-PAUSED_CARD_LINES := [?]Paused_Card_Line{
-    {PAUSED_TITLE, false},
-    {"", false},
-    {PAUSED_LINE_1, false},
-    {PAUSED_LINE_2, false},
-    {"", false},
-    {PAUSED_HINT, true},
-}
 
 // dims the whole terminal and shows a centered "paused" card, used while unfocused
 draw_dim_screen :: proc(builder: ^strings.Builder) {
@@ -163,7 +162,7 @@ draw_dim_screen :: proc(builder: ^strings.Builder) {
         move_cursor_to(builder, row)
         strings.write_string(builder, ERASE_FULL_LINE)
         set_bg_color_to(builder, DIM_BG)
-        strings.write_string(builder, strings.repeat(" ", width))
+        write_repeated(builder, " ", width)
     }
 
     content_width := 0
@@ -181,7 +180,7 @@ draw_dim_screen :: proc(builder: ^strings.Builder) {
     set_bg_color_to(builder, PAUSED_CARD_BG)
     set_fg_color_to(builder, PAUSED_CARD_FG)
     strings.write_string(builder, BOX_TOP_LEFT)
-    strings.write_string(builder, strings.repeat(BOX_HORIZONTAL, inner_width))
+    write_repeated(builder, BOX_HORIZONTAL, inner_width)
     strings.write_string(builder, BOX_TOP_RIGHT)
 
     row := box_row + 1
@@ -198,13 +197,13 @@ draw_dim_screen :: proc(builder: ^strings.Builder) {
 
         left_pad := (inner_width - len(line.text)) / 2
         right_pad := inner_width - len(line.text) - left_pad
-        strings.write_string(builder, strings.repeat(" ", left_pad))
+        write_repeated(builder, " ", left_pad)
 
         set_fg_color_to(builder, PAUSED_HINT_FG if line.is_hint else PAUSED_CARD_FG)
         strings.write_string(builder, line.text)
 
         set_fg_color_to(builder, PAUSED_CARD_FG)
-        strings.write_string(builder, strings.repeat(" ", right_pad))
+        write_repeated(builder, " ", right_pad)
         strings.write_string(builder, BOX_VERTICAL)
         row += 1
     }
@@ -218,7 +217,7 @@ draw_dim_screen :: proc(builder: ^strings.Builder) {
     set_bg_color_to(builder, PAUSED_CARD_BG)
     set_fg_color_to(builder, PAUSED_CARD_FG)
     strings.write_string(builder, BOX_BOTTOM_LEFT)
-    strings.write_string(builder, strings.repeat(BOX_HORIZONTAL, inner_width))
+    write_repeated(builder, BOX_HORIZONTAL, inner_width)
     strings.write_string(builder, BOX_BOTTOM_RIGHT)
 
     reset_all(builder)
@@ -229,8 +228,16 @@ draw_paused_card_blank_row :: proc(builder: ^strings.Builder, row, col, inner_wi
     move_cursor_to(builder, row, col)
     set_bg_color_to(builder, PAUSED_CARD_BG)
     strings.write_string(builder, BOX_VERTICAL)
-    strings.write_string(builder, strings.repeat(" ", inner_width))
+    write_repeated(builder, " ", inner_width)
     strings.write_string(builder, BOX_VERTICAL)
+}
+
+// writes s repeated count times directly into builder, avoiding the
+// per-frame allocation (and leak) that strings.repeat + write_string would cause
+write_repeated :: proc(builder: ^strings.Builder, s: string, count: int) {
+    for _ in 0..<count {
+        strings.write_string(builder, s)
+    }
 }
 
 get_target_row :: proc(height: int) -> int {
